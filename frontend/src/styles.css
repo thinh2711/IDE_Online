@@ -1,0 +1,463 @@
+/* Reset toàn cục và typography nền. */
+:root {
+  color: #fafafa;
+  background: #0a0a0a;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+a {
+  color: inherit;
+}
+
+/* Nền auth dark mode toàn màn hình. */
+.app-shell {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 48px 20px 172px;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(115, 115, 115, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(38, 38, 38, 0.38), transparent 34%),
+    #0a0a0a;
+}
+
+.app-shell::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
+
+/* Giữ các UI chính nằm trên lớp grid trang trí. */
+.portal-header,
+.preview-tabs,
+.auth-card,
+.session-debugger {
+  position: relative;
+  z-index: 1;
+}
+
+/* Khối thương hiệu hiển thị phía trên cả hai card auth. */
+.portal-header {
+  display: grid;
+  justify-items: center;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.logo-badge {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  border-radius: 14px;
+  background: #ffffff;
+  color: #050505;
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 16px 46px rgba(255, 255, 255, 0.1);
+}
+
+.portal-header h1 {
+  margin: 14px 0 5px;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.portal-header p {
+  margin: 0;
+  color: #737373;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+/* Công tắc preview Sign In / Sign Up. */
+.preview-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(100%, 336px);
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(23, 23, 23, 0.72);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.34);
+}
+
+.preview-tabs button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #a3a3a3;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.preview-tabs button.active {
+  background: #ffffff;
+  color: #050505;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
+}
+
+/* Card auth chính và các control trong form. */
+.auth-card {
+  width: min(100%, 448px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 24px;
+  padding: 31px;
+  background: rgba(23, 23, 23, 0.96);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.54),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.card-header {
+  margin-bottom: 26px;
+  text-align: center;
+}
+
+.card-header h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.card-header p {
+  margin: 8px 0 0;
+  color: #a3a3a3;
+  font-size: 0.95rem;
+}
+
+.auth-form {
+  display: grid;
+  gap: 15px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  color: #e5e5e5;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.input-shell {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0 14px;
+  background: #0a0a0a;
+  color: #737373;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+.input-shell:focus-within {
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #d4d4d4;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06);
+}
+
+input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  outline: none;
+}
+
+input::placeholder {
+  color: #525252;
+}
+
+.icon {
+  flex: 0 0 auto;
+}
+
+.forgot-link {
+  justify-self: end;
+  margin-top: -4px;
+  color: #d4d4d4;
+  font-size: 0.82rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.forgot-link:hover,
+.card-footer button:hover {
+  color: #ffffff;
+}
+
+/* Button hành động chính và phụ. */
+.primary-button,
+.github-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 12px;
+  font-weight: 850;
+}
+
+.primary-button {
+  margin-top: 5px;
+  border: 1px solid #ffffff;
+  background: #ffffff;
+  color: #050505;
+}
+
+.primary-button:hover {
+  background: #e5e5e5;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 18px;
+  color: #737373;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.divider::before,
+.divider::after {
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  content: "";
+}
+
+.github-button {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #171717;
+  color: #f5f5f5;
+}
+
+.github-button:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: #1f1f1f;
+}
+
+.message {
+  margin: 16px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 11px 12px;
+  background: rgba(10, 10, 10, 0.72);
+  color: #d4d4d4;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.card-footer {
+  margin: 24px 0 0;
+  color: #a3a3a3;
+  text-align: center;
+  font-size: 0.92rem;
+}
+
+.card-footer button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #ffffff;
+  font-weight: 850;
+}
+
+/* Panel session nổi dùng khi test backend. */
+.session-debugger {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  width: min(384px, calc(100vw - 32px));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(23, 23, 23, 0.9);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  color: #d4d4d4;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.76rem;
+  backdrop-filter: blur(18px);
+}
+
+.debugger-topline,
+.debugger-footer,
+.debugger-label {
+  display: flex;
+  align-items: center;
+}
+
+.debugger-topline {
+  justify-content: space-between;
+  color: #f5f5f5;
+  font-weight: 800;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #f97316;
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.84);
+}
+
+.debugger-section {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.debugger-label {
+  gap: 6px;
+  color: #737373;
+  font-size: 0.72rem;
+}
+
+.readonly-box {
+  min-height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px;
+  background: #0a0a0a;
+  color: #f5f5f5;
+  overflow-wrap: anywhere;
+}
+
+.debugger-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.debugger-grid > div {
+  display: grid;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 11px;
+  background: rgba(10, 10, 10, 0.72);
+}
+
+.debugger-grid strong {
+  color: #f5f5f5;
+  font-size: 0.7rem;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.debugger-footer {
+  justify-content: space-between;
+  margin-top: 13px;
+  color: #737373;
+}
+
+.debugger-footer span {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #0a0a0a;
+  color: #d4d4d4;
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 850;
+}
+
+/* Spacing mobile để debugger cố định không che card auth. */
+@media (max-width: 720px) {
+  .app-shell {
+    justify-content: flex-start;
+    padding: 28px 16px 292px;
+  }
+
+  .portal-header {
+    margin-bottom: 22px;
+  }
+
+  .auth-card {
+    border-radius: 20px;
+    padding: 24px 18px;
+  }
+
+  .session-debugger {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .debugger-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell {
+    padding-bottom: 356px;
+  }
+}
+
+@media (min-width: 421px) and (max-width: 720px) {
+  .debugger-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .debugger-grid > div:last-child {
+    grid-column: 1 / -1;
+  }
+}

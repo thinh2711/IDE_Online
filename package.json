@@ -1,0 +1,26 @@
+{
+  "name": "DOCKER_TEST",
+  "version": "1.0.0",
+  "description": "Express API with PostgreSQL and JWT auth, containerized with Docker Compose.",
+  "main": "backend/src/server.js",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "dev": "node --watch backend/src/server.js",
+    "test": "node --test backend/test/*.test.js",
+    "dev:web": "vite --host 0.0.0.0",
+    "build:web": "vite build"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^8.1.3"
+  }
+}

@@ -1,0 +1,65 @@
+# docker-compose.yml
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: docker-practice-auth-frontend
+    container_name: auth_frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: docker-practice-auth-api
+    container_name: auth_api
+    restart: always
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:secretpassword@db:5432/auth_db
+      JWT_SECRET: secret_jwt_key
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  db:
+    image: postgres:15-alpine
+    container_name: auth_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: auth_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_data:
+
+networks:
+  app-net:
+    driver: bridge
