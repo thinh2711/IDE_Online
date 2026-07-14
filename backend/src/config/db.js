@@ -63,6 +63,36 @@ const initDB = async () => {
         END IF;
       END $$;
     `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS questions (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(200) NOT NULL,
+        description TEXT NOT NULL,
+        difficulty VARCHAR(20) NOT NULL DEFAULT 'easy',
+        sample_input TEXT,
+        sample_output TEXT,
+        created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT questions_difficulty_check CHECK (difficulty IN ('easy', 'medium', 'hard'))
+      );
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS test_cases (
+        id SERIAL PRIMARY KEY,
+        question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+        input TEXT,
+        expected_output TEXT NOT NULL,
+        is_hidden BOOLEAN NOT NULL DEFAULT true,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await pool.query('CREATE INDEX IF NOT EXISTS questions_created_by_idx ON questions(created_by);');
+    await pool.query('CREATE INDEX IF NOT EXISTS test_cases_question_id_idx ON test_cases(question_id);');
     console.log('[DB] Table "users" initialized successfully.');
   } catch (err) {
     console.error('[DB] Error initializing database:', err.message);

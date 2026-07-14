@@ -84,6 +84,13 @@ export function AuthProvider({ children }) {
     setMessage('');
   }
 
+  function signOut() {
+    localStorage.removeItem('auth_token');
+    setToken('');
+    setUser(null);
+    setMessage('');
+  }
+
   function reportMessage(nextMessage) {
     setMessage(nextMessage);
   }
@@ -95,6 +102,7 @@ export function AuthProvider({ children }) {
       loadProfile,
       message,
       signIn,
+      signOut,
       signUp,
       status,
       token,

@@ -1,5 +1,5 @@
 # package.json Explained
-tôi đã hoàn thành kiểm tra xong, tiếp theo đến công việc milestone 2 
+
 File `package.json` la file cau hinh trung tam cua project Node.js. No mo ta thong tin project, cac lenh co the chay bang `npm`, va cac package can cai.
 
 Luu y: `package.json` la JSON chuan nen khong the them comment truc tiep bang `//` hoac `#`. Neu muon ghi chu, nen dat vao file markdown rieng nhu file nay.
