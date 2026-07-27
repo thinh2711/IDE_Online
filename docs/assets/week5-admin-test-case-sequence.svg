@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="804" viewBox="0 0 1280 804">
+  <defs>
+    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="0" cy="0" r="2.5" fill="#e8e8ec"/>
+      <circle cx="20" cy="20" r="2.5" fill="#e8e8ec"/>
+    </pattern>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2f2f35"/>
+    </marker>
+    <marker id="arrow-dashed" markerWidth="10" markerHeight="10" refX="1" refY="5" orient="auto">
+      <path d="M10,0 L0,5 L10,10 Z" fill="#2f2f35"/>
+    </marker>
+    <style>
+      .box { fill: #eeebff; stroke: #8b5cf6; stroke-width: 1.4; }
+      .life { stroke: #8b5cf6; stroke-width: 2.2; }
+      .line { stroke: #2f2f35; stroke-width: 2; marker-end: url(#arrow); }
+      .return { stroke: #2f2f35; stroke-width: 2; stroke-dasharray: 4 4; marker-start: url(#arrow-dashed); }
+      .label { fill: #2f2f35; font-family: Inter, Arial, sans-serif; font-size: 20px; }
+      .title { fill: #111118; font-family: Inter, Arial, sans-serif; font-size: 20px; }
+      .small { fill: #2f2f35; font-family: Inter, Arial, sans-serif; font-size: 19px; }
+    </style>
+  </defs>
+  <rect width="1280" height="804" fill="#fbfbfc"/>
+  <rect width="1280" height="804" fill="url(#dots)"/>
+
+  <rect class="box" x="61" y="12" width="194" height="84" rx="4"/>
+  <text class="title" x="158" y="61" text-anchor="middle">Admin Browser</text>
+  <line class="life" x1="158" y1="96" x2="158" y2="758"/>
+  <rect class="box" x="61" y="758" width="194" height="84" rx="4"/>
+  <text class="title" x="158" y="807" text-anchor="middle">Admin Browser</text>
+
+  <rect class="box" x="522" y="12" width="194" height="84" rx="4"/>
+  <text class="title" x="619" y="61" text-anchor="middle">Express API</text>
+  <line class="life" x1="619" y1="96" x2="619" y2="758"/>
+  <rect class="box" x="522" y="758" width="194" height="84" rx="4"/>
+  <text class="title" x="619" y="807" text-anchor="middle">Express API</text>
+
+  <rect class="box" x="870" y="12" width="194" height="84" rx="4"/>
+  <text class="title" x="967" y="61" text-anchor="middle">PostgreSQL</text>
+  <line class="life" x1="967" y1="96" x2="967" y2="758"/>
+  <rect class="box" x="870" y="758" width="194" height="84" rx="4"/>
+  <text class="title" x="967" y="807" text-anchor="middle">PostgreSQL</text>
+
+  <text class="label" x="228" y="142">POST /api/questions/:id/test-cases</text>
+  <line class="line" x1="158" y1="157" x2="616" y2="157"/>
+
+  <text class="small" x="619" y="205" text-anchor="middle">Verify JWT + require admin</text>
+  <path d="M620 221 C691 221 691 247 620 247" fill="none" stroke="#2f2f35" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <text class="small" x="619" y="305" text-anchor="middle">Validate input, expectedOutput, isHidden, sortOrder</text>
+  <path d="M620 320 C691 320 691 348 620 348" fill="none" stroke="#2f2f35" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <text class="small" x="793" y="405" text-anchor="middle">Check question exists</text>
+  <line class="line" x1="619" y1="421" x2="964" y2="421"/>
+
+  <text class="small" x="793" y="467" text-anchor="middle">Insert test case</text>
+  <line class="line" x1="619" y1="484" x2="964" y2="484"/>
+
+  <text class="small" x="341" y="531" text-anchor="middle">Created test case</text>
+  <line class="return" x1="158" y1="546" x2="619" y2="546"/>
+
+  <text class="label" x="271" y="592">PATCH /api/test-cases/:id</text>
+  <line class="line" x1="158" y1="607" x2="616" y2="607"/>
+
+  <text class="small" x="793" y="653" text-anchor="middle">Update test case</text>
+  <line class="line" x1="619" y1="670" x2="964" y2="670"/>
+
+  <text class="small" x="341" y="716" text-anchor="middle">Updated test case</text>
+  <line class="return" x1="158" y1="731" x2="619" y2="731"/>
+</svg>

@@ -12,7 +12,7 @@ Nguyen tac chinh cua giai doan nay: tai lieu phan tich/thiet ke la bat buoc, cod
 | 4 | High Level Design | C4, ERD, tech decision, scalability analysis | Tao migration/schema draft neu can |
 | 5 | Low Level Design | API spec, sequence diagram, RBAC, error/logging/security | Tao skeleton module theo API spec |
 | 6 | Demo Core Flow 1 | Cap nhat design neu thay doi | Code editor page + run code endpoint |
-| 7 | Demo Core Flow 2 | Case study isolation/failure/concurrency | History + realtime viewer hoac grading basic |
+| 7 | Demo Core Flow 2 | Case study isolation/failure/concurrency | History + grading basic; realtime reviewer de Phase 2 |
 | 8 | Review & Presentation | Final report, AI reflection, performance note | Fix demo, docker compose, polish |
 
 ## Folder tai lieu de xuat
@@ -213,10 +213,11 @@ Frontend:
 
 ### Muc tieu
 
-Bo sung 1 flow P1 va hoan thanh case study bat buoc. Chon mot trong hai:
+Bo sung 1 flow P1 va hoan thanh case study bat buoc. Theo scope moi, uu tien Admin + Coder first:
 
-1. Realtime Coder -> Viewer.
-2. Auto grading basic voi question/test case.
+1. Auto grading basic voi question/test case.
+2. Submission history cho Coder/Admin.
+3. Realtime Coder -> Reviewer de Phase 2.
 
 Neu thoi gian it, uu tien case study va demo run code on dinh hon la them nhieu feature do dang.
 
@@ -237,29 +238,28 @@ Tao file `docs/week-7-case-study.md` gom:
    - 10 concurrent submissions.
    - 20+ submissions.
    - Bottleneck: API, Judge0 worker, DB write.
-4. Realtime analysis:
-   - Co gui 100 event/s khi user go nhanh khong?
-   - Debounce/throttle bao nhieu?
+4. Reviewer/realtime Phase 2 note:
+   - Ly do defer realtime sau MVP.
+   - Dieu kien can co truoc khi lam realtime.
 5. Technical debt:
    - Dang lam tam gi?
    - Neu co them 3 thang se sua gi?
 
 ### Code nen lam
 
-Option A - Realtime:
-
-1. Them Socket.io server.
-2. Tao sessions API.
-3. Coder emit `code:update`.
-4. Viewer receive `code:changed`.
-5. Client debounce 300ms.
-
-Option B - Grading:
+Option A - Grading:
 
 1. CRUD question/test case basic cho Admin.
 2. `POST /api/submissions/grade`.
 3. Chay code qua test cases.
 4. Mask hidden test case output cho Coder.
+
+Option B - History:
+
+1. `GET /api/submissions` hoan thien filter.
+2. Frontend history table cho Coder/Admin.
+3. Chi tiet submission gom code snapshot, stdout/stderr/status.
+4. Admin co the loc theo question/user neu con thoi gian.
 
 ### Checklist cuoi tuan
 
@@ -267,7 +267,7 @@ Option B - Grading:
 | --- | --- |
 | Case study isolation/failure/concurrency xong | [ ] |
 | Demo P0 van chay on | [ ] |
-| Co them 1 flow P1 hoac grading/realtime | [ ] |
+| Co them 1 flow P1: grading hoac history | [ ] |
 | Cap nhat docs neu design doi | [ ] |
 | Ghi technical debt ro rang | [ ] |
 
@@ -377,4 +377,3 @@ Moi tuan nen chia nhu sau:
    - update compose
    - seed data
    - README
-

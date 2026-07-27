@@ -4,6 +4,16 @@ Project: Online Code Editor tương tự LeetCode.
 
 Mục tiêu tuần 5 là chuyển High Level Design thành bản thiết kế có thể implement trực tiếp ở tuần 6. Tài liệu này tập trung vào API contract, request/response, RBAC, error handling, logging và security cho MVP.
 
+## 0. Scope Update
+
+Sau khi review lại tiến độ, MVP ưu tiên **Admin + Coder first**:
+
+1. Admin quản lý user, question và test case.
+2. Coder đọc đề, viết code, chạy code và xem lịch sử submission.
+3. Reviewer/Viewer realtime để **Phase 2**, chưa implement trong giai đoạn tuần 5-6.
+
+Các bảng `sessions` và role `viewer` vẫn có thể giữ trong schema để không phải migration ngược, nhưng API/UI realtime chưa nằm trong scope code hiện tại.
+
 ## 1. MVP API Spec
 
 Base URL local:
@@ -37,8 +47,8 @@ Authorization: Bearer <token>
 
 | Method | Endpoint | Role | Mục đích |
 | --- | --- | --- | --- |
-| GET | `/questions` | Admin, Coder, Viewer | Xem danh sách câu hỏi |
-| GET | `/questions/:id` | Admin, Coder, Viewer | Xem chi tiết câu hỏi |
+| GET | `/questions` | Admin, Coder | Xem danh sách câu hỏi |
+| GET | `/questions/:id` | Admin, Coder | Xem chi tiết câu hỏi |
 | POST | `/questions` | Admin | Tạo câu hỏi |
 | PATCH | `/questions/:id` | Admin | Cập nhật câu hỏi |
 | DELETE | `/questions/:id` | Admin | Xóa câu hỏi |
@@ -52,7 +62,7 @@ Authorization: Bearer <token>
 | PATCH | `/test-cases/:id` | Admin | Cập nhật test case |
 | DELETE | `/test-cases/:id` | Admin | Xóa test case |
 
-Ghi chú security: hidden test case chỉ được trả về ở Admin API. Coder/Viewer không có endpoint đọc expected output của hidden case.
+Ghi chú security: hidden test case chỉ được trả về ở Admin API. Coder không có endpoint đọc expected output của hidden case.
 
 ### Submissions
 
@@ -64,7 +74,7 @@ Ghi chú security: hidden test case chỉ được trả về ở Admin API. Cod
 
 MVP tuần 5 tạo skeleton endpoint. Tuần 6 sẽ nối Judge0 thật.
 
-### Sessions / Realtime
+### Sessions / Realtime - Phase 2
 
 | Method | Endpoint | Role | Mục đích |
 | --- | --- | --- | --- |
@@ -73,7 +83,7 @@ MVP tuần 5 tạo skeleton endpoint. Tuần 6 sẽ nối Judge0 thật.
 | PATCH | `/sessions/:id/end` | Coder | Kết thúc session |
 | WS | `/sessions/:id` | Coder, Viewer | Đồng bộ code realtime |
 
-Sessions là contract thiết kế tuần 5. Nếu thiếu thời gian ở implementation, realtime có thể để tuần 7.
+Sessions là contract tham khảo cho Phase 2. Tuần 5-6 không code phần này để tập trung hoàn thiện Admin + Coder core flow.
 
 ## 2. Request / Response Examples
 
@@ -239,6 +249,8 @@ Response lỗi chuẩn:
 
 ### Run Code
 
+![Run Code Sequence Diagram](assets/week5-run-code-sequence.svg)
+
 ```mermaid
 sequenceDiagram
   participant C as Coder Browser
@@ -249,7 +261,7 @@ sequenceDiagram
   C->>API: POST /api/submissions/run
   API->>API: Verify JWT + RBAC
   API->>API: Validate body and payload size
-  API->>DB: Check question/session if provided
+  API->>DB: Check question if provided
   API->>DB: Insert submission status=queued
   API->>J: Submit sourceCode + stdin + limits
   J-->>API: stdout/stderr/status/time/memory
@@ -259,40 +271,43 @@ sequenceDiagram
 
 Tuần 5 skeleton dừng ở bước insert `queued`. Tuần 6 sẽ thêm Judge0 call và update result.
 
-### Realtime Code Sync
+### Admin Test Case Management
+
+![Admin Test Case Management Sequence Diagram](assets/week5-admin-test-case-sequence.svg)
 
 ```mermaid
 sequenceDiagram
-  participant C as Coder Browser
-  participant R as Realtime Server
+  participant A as Admin Browser
+  participant API as Express API
   participant DB as PostgreSQL
-  participant V as Viewer Browser
 
-  C->>R: connect(sessionId, JWT)
-  R->>DB: Verify session and coder permission
-  V->>R: join(sessionId, joinCode, JWT)
-  R->>DB: Verify viewer permission
-  C->>R: code:update snapshot/debounced patch
-  R-->>V: code:update sanitized snapshot
-  R->>DB: Persist latest snapshot periodically
+  A->>API: POST /api/questions/:id/test-cases
+  API->>API: Verify JWT + require admin
+  API->>API: Validate input, expectedOutput, isHidden, sortOrder
+  API->>DB: Check question exists
+  API->>DB: Insert test case
+  API-->>A: Created test case
+  A->>API: PATCH /api/test-cases/:id
+  API->>DB: Update test case
+  API-->>A: Updated test case
 ```
 
 ## 5. RBAC Matrix
 
-| Capability | Admin | Coder | Viewer |
+| Capability | Admin | Coder | Phase 2 Reviewer/Viewer |
 | --- | --- | --- | --- |
-| Register/login | Yes | Yes | Yes |
+| Register/login | Yes | Yes | Later |
 | List users | Yes | No | No |
 | Change user role | Yes | No | No |
-| Read questions | Yes | Yes | Yes |
+| Read questions | Yes | Yes | Later |
 | Create/update/delete questions | Yes | No | No |
 | Read hidden test cases | Yes | No | No |
 | Create/update/delete test cases | Yes | No | No |
 | Run code | Yes | Yes | No |
 | View own submissions | Yes | Yes | No |
 | View all submissions | Yes | No | No |
-| Create coding session | Optional | Yes | No |
-| Watch realtime session | Yes | Optional | Yes |
+| Create coding session | Later | Later | No |
+| Watch realtime session | Later | Later | Later |
 
 ## 6. Error Handling Strategy
 
@@ -327,7 +342,7 @@ Không log:
 | SQL injection | Dùng parameterized query với `pg` |
 | XSS output/source | Frontend render output/source bằng text/textarea/pre, không dùng HTML injection |
 | Rate limit run code | MVP có thể in-memory; scale dùng Redis |
-| Hidden test leakage | Không trả hidden test cases cho Coder/Viewer |
+| Hidden test leakage | Không trả hidden test cases cho Coder; Reviewer/Viewer là Phase 2 |
 | Judge sandbox | Code chạy trong Judge0, không chạy trực tiếp trong API container |
 | Payload size | Giới hạn source code và stdin trước khi gọi Judge0 |
 
