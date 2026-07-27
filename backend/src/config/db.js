@@ -91,9 +91,49 @@ const initDB = async () => {
       );
     `);
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        id SERIAL PRIMARY KEY,
+        coder_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        question_id INTEGER REFERENCES questions(id) ON DELETE SET NULL,
+        join_code VARCHAR(32) NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ended_at TIMESTAMP,
+        CONSTRAINT sessions_status_check CHECK (status IN ('active', 'ended'))
+      );
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS submissions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        question_id INTEGER REFERENCES questions(id) ON DELETE SET NULL,
+        session_id INTEGER REFERENCES sessions(id) ON DELETE SET NULL,
+        language VARCHAR(50) NOT NULL,
+        source_code TEXT NOT NULL,
+        stdin TEXT,
+        stdout TEXT,
+        stderr TEXT,
+        status VARCHAR(50) NOT NULL,
+        execution_time NUMERIC(10, 3),
+        memory_kb INTEGER,
+        judge0_payload JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await pool.query('CREATE INDEX IF NOT EXISTS users_role_idx ON users(role);');
     await pool.query('CREATE INDEX IF NOT EXISTS questions_created_by_idx ON questions(created_by);');
+    await pool.query('CREATE INDEX IF NOT EXISTS questions_difficulty_idx ON questions(difficulty);');
     await pool.query('CREATE INDEX IF NOT EXISTS test_cases_question_id_idx ON test_cases(question_id);');
-    console.log('[DB] Table "users" initialized successfully.');
+    await pool.query('CREATE INDEX IF NOT EXISTS sessions_coder_status_idx ON sessions(coder_id, status);');
+    await pool.query('CREATE UNIQUE INDEX IF NOT EXISTS sessions_join_code_unique ON sessions(join_code);');
+    await pool.query('CREATE INDEX IF NOT EXISTS submissions_user_created_idx ON submissions(user_id, created_at DESC);');
+    await pool.query('CREATE INDEX IF NOT EXISTS submissions_question_created_idx ON submissions(question_id, created_at DESC);');
+    await pool.query('CREATE INDEX IF NOT EXISTS submissions_session_created_idx ON submissions(session_id, created_at DESC);');
+    await pool.query('CREATE INDEX IF NOT EXISTS submissions_status_idx ON submissions(status);');
+    console.log('[DB] Database schema initialized successfully.');
   } catch (err) {
     console.error('[DB] Error initializing database:', err.message);
     process.exit(1);

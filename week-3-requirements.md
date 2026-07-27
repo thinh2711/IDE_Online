@@ -20,7 +20,7 @@ Hệ thống phân chia rõ ràng 3 phân quyền (Role):
 
     Hệ thống Authentication & Phân quyền RBAC (Admin, Coder, Viewer).
 
-    Giao diện Code Editor tích hợp Monaco Editor, hỗ trợ tối thiểu 5 ngôn ngữ (C, C++, JavaScript, Python, Java) và khu vực nhập stdin.
+    Giao diện Code Editor hỗ trợ nhập mã nguồn, chọn tối thiểu 5 ngôn ngữ (C, C++, JavaScript, Python, Java) và khu vực nhập stdin. VS Code được dùng làm môi trường phát triển source code của dự án.
 
     Tích hợp Judge0 Self-hosted để compile và thực thi code an toàn, cấu hình đầy đủ giới hạn tài nguyên.
 
@@ -296,7 +296,7 @@ Những phần repo chưa có và sẽ thuộc các tuần tiếp theo:
 1. Chưa có role/RBAC đầy đủ cho Admin, Coder, Viewer.
 2. Chưa có module questions, test-cases, submissions, sessions.
 3. Chưa tích hợp Judge0 client thật.
-4. Chưa có Monaco Editor và trang code editor.
+4. Chưa có trang code editor.
 5. Chưa có Socket.io realtime Coder -> Viewer.
 
 8. Flow demo P0 đã chốt

@@ -11,7 +11,7 @@ Xay dung web platform cho phep ung vien viet code online, chay code trong sandbo
 ### MVP bat buoc
 
 1. Auth va RBAC: Admin, Coder, Viewer.
-2. Code editor: Monaco Editor, chon ngon ngu, nhap stdin.
+2. Code editor UI: nhap ma nguon, chon ngon ngu, nhap stdin.
 3. Code execution: backend goi Judge0 self-hosted, nhan stdout, stderr, time, memory, status.
 4. History: moi lan run/submission duoc luu lai.
 5. Question/test case: Admin tao cau hoi va test case, Coder submit de cham.
@@ -28,7 +28,7 @@ Xay dung web platform cho phep ung vien viet code online, chay code trong sandbo
 
 | Layer | Chon | Ly do |
 | --- | --- | --- |
-| Frontend | React + Vite + Monaco Editor | Repo da co React/Vite, Monaco gan voi trai nghiem VS Code |
+| Frontend | React + Vite | Repo da co React/Vite; VS Code la moi truong dung de phat trien source code |
 | Backend | Node.js + Express | Repo da co modular 3-layer Express |
 | Database | PostgreSQL | Luu user, question, test case, submission, session |
 | Realtime | Socket.io | De self-host, de kiem soat 1 chieu Coder -> Viewer |
@@ -340,7 +340,7 @@ sequenceDiagram
 
 ### Week 6-7: MVP Demo
 
-1. Frontend editor page voi Monaco.
+1. Frontend editor page voi code editor UI don gian.
 2. Backend `submissions/run` goi Judge0.
 3. Luu history va hien output.
 4. Socket.io realtime Coder -> Viewer.
@@ -361,6 +361,5 @@ Thu tu nen lam:
 4. Tao module `test-cases`.
 5. Tao module `submissions` voi Judge0 client dang mock/local config truoc.
 6. Them frontend route `EditorPage`.
-7. Tich hop Monaco Editor.
+7. Hoan thien code editor UI; co the tich hop editor library o phase sau neu can.
 8. Them Socket.io sau khi flow run code on dinh.
-
