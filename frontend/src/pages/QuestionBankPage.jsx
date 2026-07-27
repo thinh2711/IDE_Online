@@ -27,7 +27,7 @@ const emptyTestCaseForm = {
   sortOrder: 0,
 };
 
-export function QuestionBankPage() {
+export function QuestionBankPage({ onOpenEditor }) {
   const { signOut, token, user } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
@@ -314,6 +314,11 @@ export function QuestionBankPage() {
                   <span>Sample output</span>
                   <pre>{selectedQuestion.sample_output || '(empty)'}</pre>
                 </div>
+              </div>
+              <div className="solve-actions">
+                <button className="white-action" type="button" onClick={() => onOpenEditor?.(selectedQuestion)}>
+                  <Icon name="play" size={15} /> Open IDE Workspace
+                </button>
               </div>
             </article>
           ) : (

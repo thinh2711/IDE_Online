@@ -221,18 +221,18 @@ Tuần 6 response sẽ đổi sang result thật từ Judge0, ví dụ `accepted
 
 ## 3. Status Codes And Error Codes
 
-| HTTP | Error code | Khi nào xảy ra |
-| --- | --- | --- |
-| 400 | `VALIDATION_ERROR` | Body thiếu field, id không hợp lệ, role không hợp lệ |
-| 401 | `UNAUTHORIZED` | Thiếu hoặc sai JWT |
-| 403 | `FORBIDDEN` | Role không được phép gọi endpoint |
-| 404 | `QUESTION_NOT_FOUND` | Không tìm thấy question |
-| 404 | `TEST_CASE_NOT_FOUND` | Không tìm thấy test case |
-| 404 | `SUBMISSION_NOT_FOUND` | Không tìm thấy submission |
-| 413 | `PAYLOAD_TOO_LARGE` | Source code hoặc stdin vượt giới hạn |
-| 429 | `RATE_LIMITED` | User chạy code quá nhiều trong thời gian ngắn |
-| 502 | `JUDGE0_UNAVAILABLE` | Judge0 timeout, connection refused hoặc lỗi upstream |
-| 500 | `INTERNAL_ERROR` | Lỗi không mong muốn |
+| HTTP  | Error code                | Khi nào xảy ra |
+| ---   | ---                       | --- |
+| 400   | `VALIDATION_ERROR`        | Body thiếu field, id không hợp lệ, role không hợp lệ |
+| 401   | `UNAUTHORIZED`            | Thiếu hoặc sai JWT |
+| 403   | `FORBIDDEN`               | Role không được phép gọi endpoint |
+| 404   | `QUESTION_NOT_FOUND`      | Không tìm thấy question |
+| 404   | `TEST_CASE_NOT_FOUND`     | Không tìm thấy test case |
+| 404   | `SUBMISSION_NOT_FOUND`    | Không tìm thấy submission |
+| 413   | `PAYLOAD_TOO_LARGE`       | Source code hoặc stdin vượt giới hạn |
+| 429   | `RATE_LIMITED`            | User chạy code quá nhiều trong thời gian ngắn |
+| 502   | `JUDGE0_UNAVAILABLE`      | Judge0 timeout, connection refused hoặc lỗi upstream |
+| 500   | `INTERNAL_ERROR`          | Lỗi không mong muốn |
 
 Response lỗi chuẩn:
 
@@ -294,20 +294,20 @@ sequenceDiagram
 
 ## 5. RBAC Matrix
 
-| Capability | Admin | Coder | Phase 2 Reviewer/Viewer |
-| --- | --- | --- | --- |
-| Register/login | Yes | Yes | Later |
-| List users | Yes | No | No |
-| Change user role | Yes | No | No |
-| Read questions | Yes | Yes | Later |
-| Create/update/delete questions | Yes | No | No |
-| Read hidden test cases | Yes | No | No |
-| Create/update/delete test cases | Yes | No | No |
-| Run code | Yes | Yes | No |
-| View own submissions | Yes | Yes | No |
-| View all submissions | Yes | No | No |
-| Create coding session | Later | Later | No |
-| Watch realtime session | Later | Later | Later |
+| Capability                      | Admin | Coder | Phase 2 Reviewer/Viewer |
+| ---                             | ---   | ---   | ---   |
+| Register/login                  | Yes   | Yes   | Later |
+| List users                      | Yes   | No    | No    |
+| Change user role                | Yes   | No    | No    |
+| Read questions                  | Yes   | Yes   | Later |
+| Create/update/delete questions  | Yes   | No    | No    |
+| Read hidden test cases          | Yes   | No    | No    |
+| Create/update/delete test cases | Yes   | No    | No    |
+| Run code                        | Yes   | Yes   | No    |
+| View own submissions            | Yes   | Yes   | No    |
+| View all submissions            | Yes   | No    | No    |
+| Create coding session           | Later | Later | No    |
+| Watch realtime session          | Later | Later | Later |
 
 ## 6. Error Handling Strategy
 
@@ -335,25 +335,25 @@ Không log:
 
 ## 8. Security Checklist
 
-| Item | Thiết kế |
-| --- | --- |
-| JWT expiry | Token nên có hạn dùng; demo có thể ngắn hơn production |
-| Input validation | Validate required fields, id, enum, source size, stdin size |
-| SQL injection | Dùng parameterized query với `pg` |
-| XSS output/source | Frontend render output/source bằng text/textarea/pre, không dùng HTML injection |
+| Item                | Thiết kế |
+| ---                 | --- |
+| JWT expiry          | Token nên có hạn dùng; demo có thể ngắn hơn production |
+| Input validation    | Validate required fields, id, enum, source size, stdin size |
+| SQL injection       | Dùng parameterized query với `pg` |
+| XSS output/source   | Frontend render output/source bằng text/textarea/pre, không dùng HTML injection |
 | Rate limit run code | MVP có thể in-memory; scale dùng Redis |
 | Hidden test leakage | Không trả hidden test cases cho Coder; Reviewer/Viewer là Phase 2 |
-| Judge sandbox | Code chạy trong Judge0, không chạy trực tiếp trong API container |
-| Payload size | Giới hạn source code và stdin trước khi gọi Judge0 |
+| Judge sandbox       | Code chạy trong Judge0, không chạy trực tiếp trong API container |
+| Payload size        | Giới hạn source code và stdin trước khi gọi Judge0 |
 
 ## 9. Week 5 Implementation Checklist
 
-| Item | Done |
-| --- | --- |
+| Item                            | Done |
+| ---                             | --- |
 | API spec có đầy đủ endpoint MVP | [x] |
-| Có request/response example | [x] |
-| Có >= 2 sequence diagrams | [x] |
-| Có RBAC matrix | [x] |
-| Có error/logging strategy | [x] |
-| Có security checklist | [x] |
-| Skeleton code khớp API spec | [x] |
+| Có request/response example     | [x] |
+| Có >= 2 sequence diagrams       | [x] |
+| Có RBAC matrix                  | [x] |
+| Có error/logging strategy       | [x] |
+| Có security checklist           | [x] |
+| Skeleton code khớp API spec     | [x] |

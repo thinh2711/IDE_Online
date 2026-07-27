@@ -2,12 +2,28 @@
 export function Icon({ name, size = 18 }) {
   const icons = {
     arrowRight: <path d="M5 12h14m-6-6 6 6-6 6" />,
+    arrowLeft: <path d="M19 12H5m6-6-6 6 6 6" />,
+    checkCircle: (
+      <>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <path d="m9 11 3 3L22 4" />
+      </>
+    ),
     clock: (
       <>
         <circle cx="12" cy="12" r="9" />
         <path d="M12 7v5l3 2" />
       </>
     ),
+    maximize: (
+      <>
+        <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+        <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+        <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+        <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+      </>
+    ),
+    play: <path d="M5 5v14l14-7-14-7Z" />,
     github: (
       <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5a10.4 10.4 0 0 0-5.5 0C8 2 7 2 7 2a6.7 6.7 0 0 0 0 3.5A5.4 5.4 0 0 0 6 9c0 3.5 3 5.5 6 5.5a4.8 4.8 0 0 0-1 3.5v4" />
     ),
@@ -40,6 +56,13 @@ export function Icon({ name, size = 18 }) {
       <>
         <path d="m4 17 6-6-6-6" />
         <path d="M12 19h8" />
+      </>
+    ),
+    upload: (
+      <>
+        <path d="M12 16V4" />
+        <path d="m7 9 5-5 5 5" />
+        <path d="M20 16v4H4v-4" />
       </>
     ),
     trash: (
