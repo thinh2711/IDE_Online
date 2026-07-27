@@ -7,7 +7,9 @@ import {
   listQuestions,
   listTestCases,
   updateQuestion,
+  updateTestCase,
 } from '../api/questions';
+import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 
 const emptyQuestionForm = {
@@ -31,6 +33,7 @@ export function QuestionBankPage() {
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
   const [questionForm, setQuestionForm] = useState(emptyQuestionForm);
   const [testCaseForm, setTestCaseForm] = useState(emptyTestCaseForm);
+  const [testCaseDrafts, setTestCaseDrafts] = useState({});
   const [testCases, setTestCases] = useState([]);
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
@@ -72,6 +75,19 @@ export function QuestionBankPage() {
     try {
       const data = await listTestCases(token, questionId);
       setTestCases(data.testCases || []);
+      setTestCaseDrafts(
+        Object.fromEntries(
+          (data.testCases || []).map((testCase) => [
+            testCase.id,
+            {
+              input: testCase.input || '',
+              expectedOutput: testCase.expected_output || '',
+              isHidden: testCase.is_hidden,
+              sortOrder: testCase.sort_order,
+            },
+          ])
+        )
+      );
     } catch (error) {
       setMessage(error.message);
     }
@@ -89,6 +105,16 @@ export function QuestionBankPage() {
     setTestCaseForm((current) => ({
       ...current,
       [name]: type === 'checkbox' ? checked : value,
+    }));
+  }
+
+  function updateTestCaseDraft(testCaseId, field, value) {
+    setTestCaseDrafts((current) => ({
+      ...current,
+      [testCaseId]: {
+        ...current[testCaseId],
+        [field]: value,
+      },
     }));
   }
 
@@ -161,6 +187,15 @@ export function QuestionBankPage() {
     try {
       const data = await createTestCase(token, selectedQuestionId, testCaseForm);
       setTestCases((current) => [...current, data.testCase]);
+      setTestCaseDrafts((current) => ({
+        ...current,
+        [data.testCase.id]: {
+          input: data.testCase.input || '',
+          expectedOutput: data.testCase.expected_output || '',
+          isHidden: data.testCase.is_hidden,
+          sortOrder: data.testCase.sort_order,
+        },
+      }));
       setTestCaseForm(emptyTestCaseForm);
       setMessage('Test case created.');
     } catch (error) {
@@ -177,7 +212,30 @@ export function QuestionBankPage() {
     try {
       await deleteTestCase(token, testCaseId);
       setTestCases((current) => current.filter((testCase) => testCase.id !== testCaseId));
+      setTestCaseDrafts((current) => {
+        const next = { ...current };
+        delete next[testCaseId];
+        return next;
+      });
       setMessage('Test case deleted.');
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setStatus('idle');
+    }
+  }
+
+  async function handleUpdateTestCase(testCaseId) {
+    const draft = testCaseDrafts[testCaseId];
+    if (!draft) return;
+
+    setStatus('loading');
+    setMessage('');
+
+    try {
+      const data = await updateTestCase(token, testCaseId, draft);
+      setTestCases((current) => current.map((testCase) => (testCase.id === testCaseId ? data.testCase : testCase)));
+      setMessage('Test case updated.');
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -265,48 +323,147 @@ export function QuestionBankPage() {
           )}
 
           {isAdmin && (
-            <section className="admin-grid">
-              <form className="admin-form" onSubmit={handleCreateQuestion}>
-                <h2>Create question</h2>
-                <input name="title" placeholder="Title" value={questionForm.title} onChange={updateQuestionField} />
-                <select name="difficulty" value={questionForm.difficulty} onChange={updateQuestionField}>
-                  <option value="easy">easy</option>
-                  <option value="medium">medium</option>
-                  <option value="hard">hard</option>
-                </select>
-                <textarea name="description" placeholder="Description" value={questionForm.description} onChange={updateQuestionField} />
-                <textarea name="sampleInput" placeholder="Sample input" value={questionForm.sampleInput} onChange={updateQuestionField} />
-                <textarea name="sampleOutput" placeholder="Sample output" value={questionForm.sampleOutput} onChange={updateQuestionField} />
-                <button type="submit" disabled={status === 'loading'}>Create</button>
-              </form>
+            <section className="problem-config">
+              <div className="problem-config-header">
+                <div>
+                  <p className="eyebrow">SYSTEM // CHALLENGE_CREATOR</p>
+                  <h2>Problem Configuration</h2>
+                </div>
+                <button className="white-action" type="button" onClick={refreshQuestions} disabled={status === 'loading'}>
+                  Refresh Bank
+                </button>
+              </div>
 
-              <form className="admin-form" onSubmit={handleCreateTestCase}>
-                <h2>Test cases</h2>
-                <textarea name="input" placeholder="Input" value={testCaseForm.input} onChange={updateTestCaseField} />
-                <textarea
-                  name="expectedOutput"
-                  placeholder="Expected output"
-                  value={testCaseForm.expectedOutput}
-                  onChange={updateTestCaseField}
-                />
-                <input name="sortOrder" min="0" type="number" value={testCaseForm.sortOrder} onChange={updateTestCaseField} />
-                <label className="checkbox-row">
-                  <input name="isHidden" type="checkbox" checked={testCaseForm.isHidden} onChange={updateTestCaseField} />
-                  Hidden test case
-                </label>
-                <button type="submit" disabled={status === 'loading' || !selectedQuestionId}>Add test case</button>
+              <section className="config-panel">
+                <div className="config-panel-heading">
+                  <span><Icon name="settings" size={16} /> METADATA CONFIGURATION</span>
+                </div>
+                <form className="metadata-form" onSubmit={handleCreateQuestion}>
+                  <label className="field-block title-field">
+                    <span>Problem Title</span>
+                    <input name="title" placeholder="e.g. Optimized Red-Black Tree Implementation" value={questionForm.title} onChange={updateQuestionField} />
+                  </label>
+                  <label className="field-block">
+                    <span>Difficulty Level</span>
+                    <select name="difficulty" value={questionForm.difficulty} onChange={updateQuestionField}>
+                      <option value="easy">EASY - L1</option>
+                      <option value="medium">MEDIUM - L2</option>
+                      <option value="hard">HARD - L3</option>
+                    </select>
+                  </label>
+                  <div className="audit-box">
+                    <div><span>AUTOMATIC_AUDIT</span><strong>READY</strong></div>
+                    <div><span>Complexity Check</span><strong className="valid">VALID</strong></div>
+                    <div><span>Memory Limit</span><strong>256 MB</strong></div>
+                  </div>
+                  <label className="field-block wide-field">
+                    <span>Technical Description</span>
+                    <textarea name="description" placeholder="Detailed constraints, edge cases, and performance requirements..." value={questionForm.description} onChange={updateQuestionField} />
+                  </label>
+                  <label className="field-block">
+                    <span>Sample Input</span>
+                    <textarea name="sampleInput" placeholder="stdin visible to coder" value={questionForm.sampleInput} onChange={updateQuestionField} />
+                  </label>
+                  <label className="field-block">
+                    <span>Sample Output</span>
+                    <textarea name="sampleOutput" placeholder="expected stdout sample" value={questionForm.sampleOutput} onChange={updateQuestionField} />
+                  </label>
+                  <button className="white-action wide-field" type="submit" disabled={status === 'loading'}>
+                    <Icon name="plus" size={16} /> New Problem
+                  </button>
+                </form>
+              </section>
 
-                <div className="test-case-list">
-                  {testCases.map((testCase) => (
-                    <div className="test-case-row" key={testCase.id}>
-                      <span>#{testCase.sort_order}</span>
-                      <strong>{testCase.is_hidden ? 'hidden' : 'visible'}</strong>
-                      <button type="button" onClick={() => handleDeleteTestCase(testCase.id)}>Delete</button>
-                    </div>
-                  ))}
+              <section className="config-panel">
+                <div className="config-panel-heading">
+                  <span><Icon name="terminal" size={16} /> TEST SUITE DEFINITION</span>
+                  <em>{testCases.length} CASES DEFINED</em>
+                </div>
+
+                <form className="append-test-case" onSubmit={handleCreateTestCase}>
+                  <textarea name="input" placeholder="INPUT BUFFER" value={testCaseForm.input} onChange={updateTestCaseField} />
+                  <textarea
+                    name="expectedOutput"
+                    placeholder="EXPECTED STDOUT"
+                    value={testCaseForm.expectedOutput}
+                    onChange={updateTestCaseField}
+                  />
+                  <input name="sortOrder" min="0" type="number" value={testCaseForm.sortOrder} onChange={updateTestCaseField} />
+                  <label className="switch-row">
+                    <input name="isHidden" type="checkbox" checked={testCaseForm.isHidden} onChange={updateTestCaseField} />
+                    <span>HIDDEN</span>
+                  </label>
+                  <button className="append-button" type="submit" disabled={status === 'loading' || !selectedQuestionId}>
+                    <Icon name="plus" size={16} /> APPEND TEST CASE
+                  </button>
+                </form>
+
+                <div className="test-suite-list">
+                  {testCases.map((testCase, index) => {
+                    const draft = testCaseDrafts[testCase.id] || {};
+                    return (
+                      <article className="test-suite-item" key={testCase.id}>
+                        <strong className="case-index">{String(index + 1).padStart(2, '0')}</strong>
+                        <div className="case-buffer-grid">
+                          <label>
+                            <span>INPUT BUFFER</span>
+                            <textarea
+                              value={draft.input || ''}
+                              onChange={(event) => updateTestCaseDraft(testCase.id, 'input', event.target.value)}
+                            />
+                          </label>
+                          <label>
+                            <span>EXPECTED STDOUT</span>
+                            <textarea
+                              value={draft.expectedOutput || ''}
+                              onChange={(event) => updateTestCaseDraft(testCase.id, 'expectedOutput', event.target.value)}
+                            />
+                          </label>
+                        </div>
+                        <div className="case-actions">
+                          <input
+                            aria-label="Sort order"
+                            min="0"
+                            type="number"
+                            value={draft.sortOrder ?? 0}
+                            onChange={(event) => updateTestCaseDraft(testCase.id, 'sortOrder', event.target.value)}
+                          />
+                          <label className="switch-row compact">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(draft.isHidden)}
+                              onChange={(event) => updateTestCaseDraft(testCase.id, 'isHidden', event.target.checked)}
+                            />
+                            <span>HIDDEN</span>
+                          </label>
+                          <button className="save-case" type="button" onClick={() => handleUpdateTestCase(testCase.id)} disabled={status === 'loading'}>
+                            Save
+                          </button>
+                          <button className="drop-case" type="button" onClick={() => handleDeleteTestCase(testCase.id)}>
+                            <Icon name="trash" size={14} /> DROP
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
                   {testCases.length === 0 && <p className="empty-state">No test cases for this question.</p>}
                 </div>
-              </form>
+              </section>
+
+              <section className="spec-grid">
+                <div className="spec-card">
+                  <h3>SECURITY SANDBOX</h3>
+                  <p><span>Process Isolation</span><strong>Judge0</strong></p>
+                  <p><span>Network Egress</span><strong className="danger">DISABLED</strong></p>
+                  <p><span>Hidden Cases</span><strong>MASKED</strong></p>
+                </div>
+                <div className="spec-card">
+                  <h3>EXECUTION LIMITS</h3>
+                  <p><span>CPU Time</span><strong>10s</strong></p>
+                  <p><span>Wall Timeout</span><strong>15s</strong></p>
+                  <p><span>Memory Limit</span><strong>256 MB</strong></p>
+                </div>
+              </section>
             </section>
           )}
         </section>

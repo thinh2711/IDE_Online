@@ -4,6 +4,7 @@ const { errorHandler } = require('./middlewares/errorHandler');
 const { logger } = require('./middlewares/logger');
 const { authRouter } = require('./modules/auth/auth.routes');
 const { questionsRouter } = require('./modules/questions/questions.routes');
+const { submissionsRouter } = require('./modules/submissions/submissions.routes');
 const { testCasesRouter } = require('./modules/test-cases/test-cases.routes');
 const { usersRouter } = require('./modules/users/users.routes');
 const { healthRouter } = require('./routes/health.routes');
@@ -23,6 +24,7 @@ const createApp = () => {
   app.use(healthRouter);
   app.use('/api', authRouter);
   app.use('/api', questionsRouter);
+  app.use('/api', submissionsRouter);
   app.use('/api', testCasesRouter);
   app.use('/api', usersRouter);
   app.use(errorHandler);

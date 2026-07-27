@@ -70,7 +70,7 @@ Judge0 chịu trách nhiệm:
 
 Hình C4 Level 2 đã thiết kế:
 
-![C4 Level 2](assets/C4_Level2.png)
+![C4 Level 2](assets/C4_Level 2.png)
 
 Ghi chú cập nhật: trong bản thiết kế hiện tại, dòng frontend được hiểu là `React + Vite`. VS Code là môi trường phát triển source code của dự án, không phải thư viện editor được nhúng trong web app.
 
