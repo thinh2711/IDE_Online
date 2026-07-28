@@ -27,7 +27,7 @@ const emptyTestCaseForm = {
   sortOrder: 0,
 };
 
-export function QuestionBankPage({ onOpenEditor }) {
+export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
   const { signOut, token, user } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
@@ -251,6 +251,7 @@ export function QuestionBankPage({ onOpenEditor }) {
           <h1>Question Bank</h1>
         </div>
         <div className="workspace-user">
+          <button type="button" onClick={onBackToDashboard}>Dashboard</button>
           <span>{user?.username}</span>
           <strong>{user?.role}</strong>
           <button type="button" onClick={signOut}>Sign out</button>
