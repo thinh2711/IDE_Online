@@ -8,7 +8,7 @@ const runSubmission = async (req, res, next) => {
     });
 
     res.status(201).json({
-      message: 'Submission skeleton created',
+      message: 'Submission executed',
       submission,
     });
   } catch (error) {

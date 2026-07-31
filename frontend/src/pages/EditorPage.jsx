@@ -40,7 +40,7 @@ export function EditorPage({ onBack, question }) {
   const sampleOutput = activeTestCase?.expected_output ?? currentQuestion?.sample_output ?? '';
   const lineNumbers = useMemo(() => code.split('\n').map((_, index) => index + 1), [code]);
   const executionStats = result
-    ? `${result.execution_time || '-'}ms / ${result.memory_kb || '-'}KB`
+    ? `${result.execution_time || '-'}s / ${result.memory_kb || '-'}KB`
     : '- / -';
 
   useEffect(() => {
@@ -235,6 +235,7 @@ export function EditorPage({ onBack, question }) {
                     <p>[LOG] Workspace is using database question data.</p>
                   )}
                   {result && <p>[SUBMISSION] id={result.id}, status={result.status}, language={result.language}</p>}
+                  {result?.stderr && <p>[STDERR] {result.stderr}</p>}
                 </div>
               </div>
             </div>

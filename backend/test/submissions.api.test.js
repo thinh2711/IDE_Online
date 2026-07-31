@@ -54,7 +54,17 @@ beforeEach(() => {
         source_code: sourceCode,
         stdin,
       },
-      status: 'queued',
+      result: {
+        memory: 912,
+        status: {
+          description: 'Accepted',
+          id: 3,
+        },
+        stderr: null,
+        stdout: 'hello\n',
+        time: '0.012',
+      },
+      status: 'Accepted',
     })),
   };
 
@@ -71,6 +81,10 @@ beforeEach(() => {
       source_code: payload.sourceCode,
       stdin: payload.stdin,
       status: payload.status,
+      stdout: payload.stdout,
+      stderr: payload.stderr,
+      execution_time: payload.executionTime,
+      memory_kb: payload.memoryKb,
       judge0_payload: payload.judge0Payload,
     })),
     findSubmissionById: mock.fn(),
@@ -107,7 +121,7 @@ beforeEach(() => {
 });
 
 describe('Group 1: submissions service', () => {
-  it('Test 1: creates a queued submission skeleton', async () => {
+  it('Test 1: creates a submission with Judge0 result', async () => {
     const result = await submissionsService.runSubmission({
       user: {
         id: 1,
@@ -121,7 +135,10 @@ describe('Group 1: submissions service', () => {
       },
     });
 
-    assert.equal(result.status, 'queued');
+    assert.equal(result.status, 'Accepted');
+    assert.equal(result.stdout, 'hello\n');
+    assert.equal(result.execution_time, '0.012');
+    assert.equal(result.memory_kb, 912);
     assert.equal(result.language, 'javascript');
     assert.equal(result.user_id, 1);
     assert.equal(result.question_id, 1);
@@ -133,7 +150,11 @@ describe('Group 1: submissions service', () => {
       language: 'javascript',
       sourceCode: "console.log('hello')",
       stdin: '',
-      status: 'queued',
+      stdout: 'hello\n',
+      stderr: null,
+      status: 'Accepted',
+      executionTime: '0.012',
+      memoryKb: 912,
       judge0Payload: {
         language: 'javascript',
         source_code: "console.log('hello')",
@@ -203,8 +224,8 @@ describe('Group 2: submissions controller', () => {
     await submissionsController.runSubmission(req, res, next);
 
     assert.equal(res.statusCode, 201);
-    assert.equal(res.body.message, 'Submission skeleton created');
-    assert.equal(res.body.submission.status, 'queued');
+    assert.equal(res.body.message, 'Submission executed');
+    assert.equal(res.body.submission.status, 'Accepted');
     assert.equal(next.mock.calls.length, 0);
   });
 });

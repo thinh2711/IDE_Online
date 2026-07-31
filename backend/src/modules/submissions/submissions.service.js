@@ -95,7 +95,11 @@ const runSubmission = async ({ body, user }) => {
     language: payload.language,
     sourceCode: payload.sourceCode,
     stdin: payload.stdin,
+    stdout: judge0Draft.result?.stdout || null,
+    stderr: judge0Draft.result?.stderr || judge0Draft.result?.compile_output || judge0Draft.result?.message || null,
     status: judge0Draft.status,
+    executionTime: judge0Draft.result?.time || null,
+    memoryKb: judge0Draft.result?.memory || null,
     judge0Payload: judge0Draft.payload,
   });
 };

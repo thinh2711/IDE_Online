@@ -33,6 +33,7 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://postgres:secretpassword@db:5432/auth_db
       JWT_SECRET: secret_jwt_key
+      JUDGE0_BASE_URL: https://ce.judge0.com
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
