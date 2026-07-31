@@ -3,49 +3,6 @@ import { listQuestions } from '../api/questions';
 import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 
-const fallbackQuestions = [
-  {
-    id: 'demo-1',
-    title: 'Two Sum',
-    difficulty: 'easy',
-    acceptance: '49.2%',
-    solved: true,
-    tags: 'Array, Hash Table',
-  },
-  {
-    id: 'demo-2',
-    title: 'Add Two Numbers',
-    difficulty: 'medium',
-    acceptance: '40.1%',
-    solved: false,
-    tags: 'Linked List, Math',
-  },
-  {
-    id: 'demo-3',
-    title: 'Longest Substring Without Repeating Characters',
-    difficulty: 'medium',
-    acceptance: '33.8%',
-    solved: true,
-    tags: 'Hash Table, String, Sliding Window',
-  },
-  {
-    id: 'demo-4',
-    title: 'Median of Two Sorted Arrays',
-    difficulty: 'hard',
-    acceptance: '35.7%',
-    solved: false,
-    tags: 'Array, Binary Search, Divide and Conquer',
-  },
-  {
-    id: 'demo-5',
-    title: 'Reverse String',
-    difficulty: 'easy',
-    acceptance: '75.3%',
-    solved: true,
-    tags: 'Two Pointers, String',
-  },
-];
-
 const acceptanceByDifficulty = {
   easy: '75.3%',
   hard: '35.7%',
@@ -96,8 +53,7 @@ export function DashboardPage({ onManageProblems, onOpenEditor }) {
   }
 
   const challengeRows = useMemo(() => {
-    const source = questions.length > 0 ? questions : fallbackQuestions;
-    const normalized = source.map(normalizeQuestion);
+    const normalized = questions.map(normalizeQuestion);
     const loweredQuery = query.trim().toLowerCase();
 
     if (!loweredQuery) return normalized;
@@ -111,7 +67,7 @@ export function DashboardPage({ onManageProblems, onOpenEditor }) {
     });
   }, [query, questions]);
 
-  const totalQuestions = questions.length || fallbackQuestions.length;
+  const totalQuestions = questions.length;
   const solvedCount = challengeRows.filter((question) => question.solved).length;
 
   return (
@@ -124,7 +80,7 @@ export function DashboardPage({ onManageProblems, onOpenEditor }) {
 
         <nav className="dashboard-nav">
           <button className="active" type="button">DASHBOARD</button>
-          <button type="button" onClick={() => onOpenEditor?.(challengeRows[0])}>IDE</button>
+          <button type="button" onClick={() => onOpenEditor?.(challengeRows[0] || null)}>IDE</button>
           <button type="button">CHALLENGES</button>
           <button type="button">COMMUNITY</button>
         </nav>
@@ -216,7 +172,11 @@ export function DashboardPage({ onManageProblems, onOpenEditor }) {
                 </div>
               </article>
             ))}
-            {challengeRows.length === 0 && <p className="dashboard-empty">No challenges match the current filter.</p>}
+            {challengeRows.length === 0 && (
+              <p className="dashboard-empty">
+                {questions.length === 0 ? 'No real questions in database yet.' : 'No challenges match the current filter.'}
+              </p>
+            )}
           </div>
 
           <footer className="challenge-footer">

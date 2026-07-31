@@ -50,11 +50,17 @@ const ensureQuestionExists = async (questionId) => {
   }
 };
 
-const listTestCasesByQuestion = async (questionId) => {
+const listTestCasesByQuestion = async ({ questionId, role = 'admin' }) => {
   const parsedQuestionId = parsePositiveId(questionId, 'question id');
   await ensureQuestionExists(parsedQuestionId);
 
-  return testCasesRepository.findTestCasesByQuestionId(parsedQuestionId);
+  const testCases = await testCasesRepository.findTestCasesByQuestionId(parsedQuestionId);
+
+  if (role === 'admin') {
+    return testCases;
+  }
+
+  return testCases.filter((testCase) => !testCase.is_hidden);
 };
 
 const createTestCase = async ({ questionId, body }) => {

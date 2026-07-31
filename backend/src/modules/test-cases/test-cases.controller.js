@@ -2,7 +2,10 @@ const testCasesService = require('./test-cases.service');
 
 const listTestCasesByQuestion = async (req, res, next) => {
   try {
-    const testCases = await testCasesService.listTestCasesByQuestion(req.params.id);
+    const testCases = await testCasesService.listTestCasesByQuestion({
+      questionId: req.params.id,
+      role: req.user?.role,
+    });
     res.status(200).json({ testCases });
   } catch (error) {
     next(error);

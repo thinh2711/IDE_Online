@@ -5,7 +5,7 @@ const testCasesController = require('./test-cases.controller');
 
 const router = express.Router();
 
-router.get('/questions/:id/test-cases', authenticateToken, authorizeRoles('admin'), testCasesController.listTestCasesByQuestion);
+router.get('/questions/:id/test-cases', authenticateToken, authorizeRoles('admin', 'coder'), testCasesController.listTestCasesByQuestion);
 router.post('/questions/:id/test-cases', authenticateToken, authorizeRoles('admin'), testCasesController.createTestCase);
 router.patch('/test-cases/:id', authenticateToken, authorizeRoles('admin'), testCasesController.updateTestCase);
 router.delete('/test-cases/:id', authenticateToken, authorizeRoles('admin'), testCasesController.deleteTestCase);

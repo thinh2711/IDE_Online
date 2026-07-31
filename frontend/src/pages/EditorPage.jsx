@@ -1,43 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { getQuestion, listTestCases } from '../api/questions';
 import { runSubmission } from '../api/submissions';
 import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 
-const defaultCode = `class Solution:
-    def twoSum(self, nums, target):
-        # Initialize hash map to store value to index mapping
-        prevMap = {} # val : index
-
-        for i, n in enumerate(nums):
-            diff = target - n
-            if diff in prevMap:
-                return [prevMap[diff], i]
-            prevMap[n] = i
-        return []`;
+const defaultCode = '';
 
 const languageOptions = [
   { extension: 'py', label: 'Python 3', value: 'python' },
   { extension: 'js', label: 'JavaScript', value: 'javascript' },
   { extension: 'cpp', label: 'C++', value: 'cpp' },
   { extension: 'java', label: 'Java', value: 'java' },
-];
-
-const examples = [
-  {
-    expected: '[0,1]',
-    input: 'nums = [2,7,11,15], target = 9',
-    output: '[0,1]',
-  },
-  {
-    expected: '[1,2]',
-    input: 'nums = [3,2,4], target = 6',
-    output: '[1,2]',
-  },
-  {
-    expected: '[0,1]',
-    input: 'nums = [3,3], target = 6',
-    output: '[0,1]',
-  },
 ];
 
 const difficultyClass = {
@@ -52,19 +25,54 @@ export function EditorPage({ onBack, question }) {
   const [activeConsoleTab, setActiveConsoleTab] = useState('Test Cases');
   const [code, setCode] = useState(defaultCode);
   const [language, setLanguage] = useState('python');
+  const [currentQuestion, setCurrentQuestion] = useState(question);
+  const [testCases, setTestCases] = useState([]);
   const [result, setResult] = useState(null);
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
 
   const selectedLanguage = languageOptions.find((option) => option.value === language) || languageOptions[0];
-  const title = question?.title || 'Two Sum';
-  const difficulty = question?.difficulty || 'easy';
-  const description =
-    question?.description ||
-    'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.';
-  const sampleInput = question?.sample_input || examples[activeCase].input;
-  const sampleOutput = question?.sample_output || examples[activeCase].expected;
+  const activeTestCase = testCases[activeCase] || null;
+  const title = currentQuestion?.title || 'Select a real question';
+  const difficulty = currentQuestion?.difficulty || 'easy';
+  const description = currentQuestion?.description || '';
+  const sampleInput = activeTestCase?.input ?? currentQuestion?.sample_input ?? '';
+  const sampleOutput = activeTestCase?.expected_output ?? currentQuestion?.sample_output ?? '';
   const lineNumbers = useMemo(() => code.split('\n').map((_, index) => index + 1), [code]);
+  const executionStats = result
+    ? `${result.execution_time || '-'}ms / ${result.memory_kb || '-'}KB`
+    : '- / -';
+
+  useEffect(() => {
+    setCurrentQuestion(question);
+    setActiveCase(0);
+    setResult(null);
+  }, [question]);
+
+  useEffect(() => {
+    if (!question?.id) return;
+
+    loadQuestionWorkspace(question.id).catch((error) => {
+      setMessage(error.message);
+      setActiveConsoleTab('Terminal');
+    });
+  }, [question?.id]);
+
+  async function loadQuestionWorkspace(questionId) {
+    setStatus('loading');
+    setMessage('');
+
+    try {
+      const [questionData, testCaseData] = await Promise.all([
+        getQuestion(token, questionId),
+        listTestCases(token, questionId),
+      ]);
+      setCurrentQuestion(questionData.question);
+      setTestCases(testCaseData.testCases || []);
+    } finally {
+      setStatus('idle');
+    }
+  }
 
   async function handleRun() {
     setStatus('running');
@@ -73,7 +81,7 @@ export function EditorPage({ onBack, question }) {
     try {
       const data = await runSubmission(token, {
         language,
-        questionId: question?.id || null,
+        questionId: currentQuestion?.id || null,
         sourceCode: code,
         stdin: sampleInput,
       });
@@ -129,36 +137,19 @@ export function EditorPage({ onBack, question }) {
               <h2>1. {title}</h2>
               <div className="problem-tags">
                 <span className={`difficulty-tag ${difficultyClass[difficulty] || 'easy'}`}>{difficulty.toUpperCase()}</span>
-                <span>ARRAY</span>
-                <span>HASH TABLE</span>
               </div>
             </section>
 
             <section className="problem-copy">
-              <p>{description}</p>
-              <p>
-                You may assume that each input has exactly one solution, and you may not use the same element twice.
-                Return the answer in any order.
-              </p>
+              <p>{description || 'No description has been added for this question yet.'}</p>
             </section>
 
             <section>
               <h3>&lt;&gt; Example 1:</h3>
               <div className="example-box">
-                <p><strong>Input:</strong> {sampleInput}</p>
-                <p><strong>Output:</strong> {sampleOutput}</p>
-                <p><em>Explanation:</em> Because nums[0] + nums[1] matches the target, return the two indices.</p>
+                <p><strong>Input:</strong> {sampleInput || '(empty)'}</p>
+                <p><strong>Output:</strong> {sampleOutput || '(no sample output)'}</p>
               </div>
-            </section>
-
-            <section>
-              <h3>Constraints:</h3>
-              <ul className="constraints-list">
-                <li>2 &lt;= nums.length &lt;= 10^4</li>
-                <li>-10^9 &lt;= nums[i] &lt;= 10^9</li>
-                <li>-10^9 &lt;= target &lt;= 10^9</li>
-                <li>Only one valid answer exists.</li>
-              </ul>
             </section>
           </div>
         </aside>
@@ -209,30 +200,31 @@ export function EditorPage({ onBack, question }) {
                 <span className={result?.status === 'queued' ? 'queued' : 'accepted'}>
                   <Icon name="checkCircle" size={14} /> {result?.status ? result.status.toUpperCase() : 'READY'}
                 </span>
-                <em>48ms / 14.2MB</em>
+                <em>{executionStats}</em>
               </div>
             </div>
 
             <div className="console-body">
               <div className="case-tabs">
-                {examples.map((example, index) => (
+                {testCases.map((testCase, index) => (
                   <button
                     className={activeCase === index ? 'active' : ''}
-                    key={example.input}
+                    key={testCase.id}
                     type="button"
                     onClick={() => setActiveCase(index)}
                   >
                     {index + 1}
                   </button>
                 ))}
+                {testCases.length === 0 && <span className="empty-state">No visible test cases</span>}
               </div>
 
               <div className="console-output">
                 <p className="console-kicker">&gt; SESSION DEBUGGER</p>
                 <div className="console-box">
-                  <p><strong>Input:</strong>    {examples[activeCase].input}</p>
-                  <p><strong>Output:</strong>   <span>{result?.stdout || examples[activeCase].output}</span></p>
-                  <p><strong>Expected:</strong> {examples[activeCase].expected}</p>
+                  <p><strong>Input:</strong>    {sampleInput || '(empty)'}</p>
+                  <p><strong>Output:</strong>   <span>{result?.stdout || '(not run yet)'}</span></p>
+                  <p><strong>Expected:</strong> {sampleOutput || '(no expected output)'}</p>
                 </div>
 
                 <p className="console-kicker">:= STDOUT</p>
@@ -240,12 +232,7 @@ export function EditorPage({ onBack, question }) {
                   {message ? (
                     <p>[API] {message}</p>
                   ) : (
-                    <>
-                      <p>[LOG] Traversing index 0: value=2, complement=7...</p>
-                      <p>[LOG] 7 not in map, adding {'{2: 0}'}...</p>
-                      <p>[LOG] Traversing index 1: value=7, complement=2...</p>
-                      <p>[LOG] Match found. Returning [0, 1].</p>
-                    </>
+                    <p>[LOG] Workspace is using database question data.</p>
                   )}
                   {result && <p>[SUBMISSION] id={result.id}, status={result.status}, language={result.language}</p>}
                 </div>
@@ -258,7 +245,6 @@ export function EditorPage({ onBack, question }) {
       <footer className="ide-statusbar">
         <div>
           <span>[= LOCALHOST</span>
-          <span>Latency: 22ms</span>
         </div>
         <div>
           <span>UTF-8</span>
