@@ -9,6 +9,12 @@ export function Icon({ name, size = 18 }) {
         <path d="m9 11 3 3L22 4" />
       </>
     ),
+    chart: (
+      <>
+        <path d="M3 3v18h18" />
+        <path d="M7 14l3-3 3 2 5-7" />
+      </>
+    ),
     bell: (
       <>
         <path d="M10 21h4" />

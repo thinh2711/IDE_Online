@@ -4,6 +4,7 @@ import {
   createTestCase,
   deleteQuestion,
   deleteTestCase,
+  getQuestion,
   listQuestions,
   listTestCases,
   updateQuestion,
@@ -35,6 +36,8 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
   const [testCaseForm, setTestCaseForm] = useState(emptyTestCaseForm);
   const [testCaseDrafts, setTestCaseDrafts] = useState({});
   const [testCases, setTestCases] = useState([]);
+  const [editingTestCaseId, setEditingTestCaseId] = useState(null);
+  const [showTestCaseForm, setShowTestCaseForm] = useState(false);
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
 
@@ -50,11 +53,29 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
 
   useEffect(() => {
     if (isAdmin && selectedQuestionId) {
+      loadQuestionDetail(selectedQuestionId).catch(() => {});
       refreshTestCases(selectedQuestionId).catch(() => {});
     } else {
       setTestCases([]);
+      setEditingTestCaseId(null);
+      setShowTestCaseForm(false);
     }
   }, [isAdmin, selectedQuestionId]);
+
+  useEffect(() => {
+    if (!selectedQuestion) {
+      setQuestionForm(emptyQuestionForm);
+      return;
+    }
+
+    setQuestionForm({
+      title: selectedQuestion.title || '',
+      description: selectedQuestion.description || '',
+      difficulty: selectedQuestion.difficulty || 'easy',
+      sampleInput: selectedQuestion.sample_input || '',
+      sampleOutput: selectedQuestion.sample_output || '',
+    });
+  }, [selectedQuestion]);
 
   async function refreshQuestions() {
     setStatus('loading');
@@ -91,6 +112,24 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
     } catch (error) {
       setMessage(error.message);
     }
+  }
+
+  async function loadQuestionDetail(questionId) {
+    const data = await getQuestion(token, questionId);
+    setQuestions((current) =>
+      current.map((question) => (question.id === questionId ? { ...question, ...data.question } : question))
+    );
+  }
+
+  function startNewQuestion() {
+    setSelectedQuestionId(null);
+    setQuestionForm(emptyQuestionForm);
+    setTestCaseForm(emptyTestCaseForm);
+    setTestCases([]);
+    setTestCaseDrafts({});
+    setEditingTestCaseId(null);
+    setShowTestCaseForm(false);
+    setMessage('');
   }
 
   function updateQuestionField(event) {
@@ -136,6 +175,30 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
     }
   }
 
+  async function handleSaveQuestion(event) {
+    event.preventDefault();
+
+    if (!selectedQuestion) {
+      await handleCreateQuestion(event);
+      return;
+    }
+
+    setStatus('loading');
+    setMessage('');
+
+    try {
+      const data = await updateQuestion(token, selectedQuestion.id, questionForm);
+      setQuestions((current) =>
+        current.map((question) => (question.id === selectedQuestion.id ? data.question : question))
+      );
+      setMessage('Question updated.');
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setStatus('idle');
+    }
+  }
+
   async function handleDeleteQuestion(questionId) {
     setStatus('loading');
     setMessage('');
@@ -152,32 +215,16 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
     }
   }
 
-  async function handleDifficultyChange(question, difficulty) {
-    setStatus('loading');
-    setMessage('');
-
-    try {
-      const data = await updateQuestion(token, question.id, {
-        title: question.title,
-        description: question.description,
-        difficulty,
-        sampleInput: question.sample_input || '',
-        sampleOutput: question.sample_output || '',
-      });
-      setQuestions((current) => current.map((item) => (item.id === question.id ? data.question : item)));
-      setMessage('Question updated.');
-    } catch (error) {
-      setMessage(error.message);
-    } finally {
-      setStatus('idle');
-    }
-  }
-
   async function handleCreateTestCase(event) {
     event.preventDefault();
 
     if (!selectedQuestionId) {
       setMessage('Select a question first.');
+      return;
+    }
+
+    if (!testCaseForm.expectedOutput.trim()) {
+      setMessage('Expected stdout is required before adding a test case.');
       return;
     }
 
@@ -197,6 +244,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
         },
       }));
       setTestCaseForm(emptyTestCaseForm);
+      setShowTestCaseForm(false);
       setMessage('Test case created.');
     } catch (error) {
       setMessage(error.message);
@@ -217,6 +265,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
         delete next[testCaseId];
         return next;
       });
+      setEditingTestCaseId((currentId) => (currentId === testCaseId ? null : currentId));
       setMessage('Test case deleted.');
     } catch (error) {
       setMessage(error.message);
@@ -229,12 +278,18 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
     const draft = testCaseDrafts[testCaseId];
     if (!draft) return;
 
+    if (!String(draft.expectedOutput || '').trim()) {
+      setMessage('Expected stdout is required before saving a test case.');
+      return;
+    }
+
     setStatus('loading');
     setMessage('');
 
     try {
       const data = await updateTestCase(token, testCaseId, draft);
       setTestCases((current) => current.map((testCase) => (testCase.id === testCaseId ? data.testCase : testCase)));
+      setEditingTestCaseId(null);
       setMessage('Test case updated.');
     } catch (error) {
       setMessage(error.message);
@@ -244,46 +299,88 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
   }
 
   return (
-    <main className="workspace-shell">
-      <header className="workspace-header">
+    <main className="admin-console-shell">
+      <aside className="admin-console-sidebar">
         <div>
-          <p className="eyebrow">WEB IDE</p>
-          <h1>Question Bank</h1>
+          <section className="admin-identity-card">
+            <span><Icon name="user" size={18} /></span>
+            <div>
+              <strong>ADMIN CONSOLE</strong>
+              <em>SYSTEM ARCHITECT</em>
+            </div>
+          </section>
+
+          <button
+            className="admin-new-problem"
+            type="button"
+            onClick={startNewQuestion}
+          >
+            <Icon name="plus" size={16} /> New Problem
+          </button>
+
+          <nav className="admin-side-nav" aria-label="Admin navigation">
+            <button type="button"><Icon name="terminal" size={16} /> Overview</button>
+            <button className="active" type="button"><Icon name="folder" size={16} /> Manage Problems</button>
+            <button type="button"><Icon name="settings" size={16} /> Test Cases</button>
+            <button type="button"><Icon name="clock" size={16} /> Submissions</button>
+            <button type="button"><Icon name="chart" size={16} /> Analytics</button>
+          </nav>
         </div>
-        <div className="workspace-user">
-          <button type="button" onClick={onBackToDashboard}>Dashboard</button>
-          <span>{user?.username}</span>
-          <strong>{user?.role}</strong>
-          <button type="button" onClick={signOut}>Sign out</button>
+
+        <div className="admin-side-footer">
+          <button type="button"><Icon name="book" size={15} /> Documentation</button>
+          <button type="button"><Icon name="shield" size={15} /> Support</button>
         </div>
-      </header>
+      </aside>
 
-      {message && <p className="workspace-message">{message}</p>}
-
-      <section className="question-layout">
-        <aside className="question-sidebar">
-          <div className="panel-heading">
-            <h2>Questions</h2>
-            <button type="button" onClick={refreshQuestions} disabled={status === 'loading'}>Refresh</button>
+      <section className="admin-console-area">
+        <header className="admin-console-topbar">
+          <strong>Backend Portal</strong>
+          <nav>
+            <button type="button" onClick={onBackToDashboard}>Dashboard</button>
+            <button type="button" onClick={() => onOpenEditor?.(selectedQuestion)}>IDE</button>
+            <button className="active" type="button">Challenges</button>
+            <button type="button">Community</button>
+          </nav>
+          <div>
+            <button type="button" title="Notifications"><Icon name="bell" size={17} /></button>
+            <button type="button" title="Settings"><Icon name="settings" size={17} /></button>
+            <button className="admin-avatar" type="button" onClick={signOut} title="Sign out">
+              {user?.username?.slice(0, 1)?.toUpperCase() || 'A'}
+            </button>
           </div>
+        </header>
 
-          <div className="question-list">
-            {questions.map((question) => (
-              <button
-                className={question.id === selectedQuestionId ? 'question-row active' : 'question-row'}
-                key={question.id}
-                type="button"
-                onClick={() => setSelectedQuestionId(question.id)}
-              >
-                <span>{question.title}</span>
-                <em>{question.difficulty}</em>
-              </button>
-            ))}
-            {questions.length === 0 && <p className="empty-state">No questions yet.</p>}
-          </div>
-        </aside>
+        <section className="admin-console-content">
+          {message && <p className="workspace-message">{message}</p>}
 
-        <section className="question-main">
+          <section className="admin-manage-grid">
+            <aside className="admin-question-index">
+              <div className="panel-heading">
+                <div>
+                  <p className="eyebrow">PROBLEM_INDEX</p>
+                  <h2>Questions</h2>
+                </div>
+                <button type="button" onClick={refreshQuestions} disabled={status === 'loading'}>Refresh</button>
+              </div>
+
+              <div className="question-list">
+                {questions.map((question) => (
+                  <button
+                    className={question.id === selectedQuestionId ? 'question-row active' : 'question-row'}
+                    key={question.id}
+                    type="button"
+                    onClick={() => setSelectedQuestionId(question.id)}
+                  >
+                    <span>{question.title}</span>
+                    <em>{question.difficulty}</em>
+                  </button>
+                ))}
+                {questions.length === 0 && <p className="empty-state">No questions yet.</p>}
+              </div>
+            </aside>
+
+            <section className="admin-manage-main">
           {selectedQuestion ? (
             <article className="question-detail">
               <div className="panel-heading">
@@ -293,14 +390,6 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
                 </div>
                 {isAdmin && (
                   <div className="inline-actions">
-                    <select
-                      value={selectedQuestion.difficulty}
-                      onChange={(event) => handleDifficultyChange(selectedQuestion, event.target.value)}
-                    >
-                      <option value="easy">easy</option>
-                      <option value="medium">medium</option>
-                      <option value="hard">hard</option>
-                    </select>
                     <button type="button" onClick={() => handleDeleteQuestion(selectedQuestion.id)}>Delete</button>
                   </div>
                 )}
@@ -344,7 +433,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
                 <div className="config-panel-heading">
                   <span><Icon name="settings" size={16} /> METADATA CONFIGURATION</span>
                 </div>
-                <form className="metadata-form" onSubmit={handleCreateQuestion}>
+                <form className="metadata-form" onSubmit={handleSaveQuestion}>
                   <label className="field-block title-field">
                     <span>Problem Title</span>
                     <input name="title" placeholder="e.g. Optimized Red-Black Tree Implementation" value={questionForm.title} onChange={updateQuestionField} />
@@ -375,7 +464,8 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
                     <textarea name="sampleOutput" placeholder="expected stdout sample" value={questionForm.sampleOutput} onChange={updateQuestionField} />
                   </label>
                   <button className="white-action wide-field" type="submit" disabled={status === 'loading'}>
-                    <Icon name="plus" size={16} /> New Problem
+                    <Icon name={selectedQuestion ? 'checkCircle' : 'plus'} size={16} />
+                    {selectedQuestion ? 'Save Problem' : 'Create Problem'}
                   </button>
                 </form>
               </section>
@@ -386,69 +476,143 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
                   <em>{testCases.length} CASES DEFINED</em>
                 </div>
 
-                <form className="append-test-case" onSubmit={handleCreateTestCase}>
-                  <textarea name="input" placeholder="INPUT BUFFER" value={testCaseForm.input} onChange={updateTestCaseField} />
-                  <textarea
-                    name="expectedOutput"
-                    placeholder="EXPECTED STDOUT"
-                    value={testCaseForm.expectedOutput}
-                    onChange={updateTestCaseField}
-                  />
-                  <input name="sortOrder" min="0" type="number" value={testCaseForm.sortOrder} onChange={updateTestCaseField} />
-                  <label className="switch-row">
-                    <input name="isHidden" type="checkbox" checked={testCaseForm.isHidden} onChange={updateTestCaseField} />
-                    <span>HIDDEN</span>
-                  </label>
-                  <button className="append-button" type="submit" disabled={status === 'loading' || !selectedQuestionId}>
-                    <Icon name="plus" size={16} /> APPEND TEST CASE
+                {showTestCaseForm ? (
+                  <form className="append-test-case" onSubmit={handleCreateTestCase}>
+                    <div className="test-case-form-heading">
+                      <strong>New Test Case</strong>
+                      <span>Input can be empty; expected stdout is required.</span>
+                    </div>
+                    <label>
+                      <span>INPUT BUFFER</span>
+                      <textarea name="input" placeholder="stdin or structured input" value={testCaseForm.input} onChange={updateTestCaseField} />
+                    </label>
+                    <label>
+                      <span>EXPECTED STDOUT</span>
+                      <textarea
+                        name="expectedOutput"
+                        placeholder="expected output for comparison"
+                        value={testCaseForm.expectedOutput}
+                        onChange={updateTestCaseField}
+                      />
+                    </label>
+                    <div className="test-case-form-controls">
+                      <label>
+                        <span>SORT</span>
+                        <input name="sortOrder" min="0" type="number" value={testCaseForm.sortOrder} onChange={updateTestCaseField} />
+                      </label>
+                      <label className="switch-row">
+                        <input name="isHidden" type="checkbox" checked={testCaseForm.isHidden} onChange={updateTestCaseField} />
+                        <span>HIDDEN</span>
+                      </label>
+                    </div>
+                    <div className="test-case-form-actions">
+                      <button className="append-button" type="submit" disabled={status === 'loading' || !selectedQuestionId}>
+                        <Icon name="plus" size={16} /> APPEND TEST CASE
+                      </button>
+                      <button
+                        className="cancel-case"
+                        type="button"
+                        onClick={() => {
+                          setShowTestCaseForm(false);
+                          setTestCaseForm(emptyTestCaseForm);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <button
+                    className="add-test-case-trigger"
+                    type="button"
+                    onClick={() => setShowTestCaseForm(true)}
+                    disabled={!selectedQuestionId}
+                  >
+                    <Icon name="plus" size={16} /> Add Test Case
                   </button>
-                </form>
+                )}
 
                 <div className="test-suite-list">
+                  {testCases.length > 0 && (
+                    <div className="test-suite-list-heading">
+                      <strong>Existing Test Cases</strong>
+                      <span>Edit inline, then press Save.</span>
+                    </div>
+                  )}
                   {testCases.map((testCase, index) => {
                     const draft = testCaseDrafts[testCase.id] || {};
+                    const isEditing = editingTestCaseId === testCase.id;
                     return (
                       <article className="test-suite-item" key={testCase.id}>
                         <strong className="case-index">{String(index + 1).padStart(2, '0')}</strong>
-                        <div className="case-buffer-grid">
-                          <label>
-                            <span>INPUT BUFFER</span>
-                            <textarea
-                              value={draft.input || ''}
-                              onChange={(event) => updateTestCaseDraft(testCase.id, 'input', event.target.value)}
-                            />
-                          </label>
-                          <label>
-                            <span>EXPECTED STDOUT</span>
-                            <textarea
-                              value={draft.expectedOutput || ''}
-                              onChange={(event) => updateTestCaseDraft(testCase.id, 'expectedOutput', event.target.value)}
-                            />
-                          </label>
-                        </div>
-                        <div className="case-actions">
-                          <input
-                            aria-label="Sort order"
-                            min="0"
-                            type="number"
-                            value={draft.sortOrder ?? 0}
-                            onChange={(event) => updateTestCaseDraft(testCase.id, 'sortOrder', event.target.value)}
-                          />
-                          <label className="switch-row compact">
-                            <input
-                              type="checkbox"
-                              checked={Boolean(draft.isHidden)}
-                              onChange={(event) => updateTestCaseDraft(testCase.id, 'isHidden', event.target.checked)}
-                            />
-                            <span>HIDDEN</span>
-                          </label>
-                          <button className="save-case" type="button" onClick={() => handleUpdateTestCase(testCase.id)} disabled={status === 'loading'}>
-                            Save
-                          </button>
-                          <button className="drop-case" type="button" onClick={() => handleDeleteTestCase(testCase.id)}>
-                            <Icon name="trash" size={14} /> DROP
-                          </button>
-                        </div>
+                        {isEditing ? (
+                          <>
+                            <div className="case-buffer-grid">
+                              <label>
+                                <span>INPUT BUFFER</span>
+                                <textarea
+                                  value={draft.input || ''}
+                                  onChange={(event) => updateTestCaseDraft(testCase.id, 'input', event.target.value)}
+                                />
+                              </label>
+                              <label>
+                                <span>EXPECTED STDOUT</span>
+                                <textarea
+                                  value={draft.expectedOutput || ''}
+                                  onChange={(event) => updateTestCaseDraft(testCase.id, 'expectedOutput', event.target.value)}
+                                />
+                              </label>
+                            </div>
+                            <div className="case-actions">
+                              <input
+                                aria-label="Sort order"
+                                min="0"
+                                type="number"
+                                value={draft.sortOrder ?? 0}
+                                onChange={(event) => updateTestCaseDraft(testCase.id, 'sortOrder', event.target.value)}
+                              />
+                              <label className="switch-row compact">
+                                <input
+                                  type="checkbox"
+                                  checked={Boolean(draft.isHidden)}
+                                  onChange={(event) => updateTestCaseDraft(testCase.id, 'isHidden', event.target.checked)}
+                                />
+                                <span>HIDDEN</span>
+                              </label>
+                              <button className="save-case" type="button" onClick={() => handleUpdateTestCase(testCase.id)} disabled={status === 'loading'}>
+                                Save
+                              </button>
+                              <button className="cancel-case" type="button" onClick={() => setEditingTestCaseId(null)}>
+                                Cancel
+                              </button>
+                              <button className="drop-case" type="button" onClick={() => handleDeleteTestCase(testCase.id)}>
+                                <Icon name="trash" size={14} /> DROP
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="case-summary-grid">
+                              <div>
+                                <span>INPUT BUFFER</span>
+                                <pre>{draft.input || '(empty input)'}</pre>
+                              </div>
+                              <div>
+                                <span>EXPECTED STDOUT</span>
+                                <pre>{draft.expectedOutput || '(missing expected stdout)'}</pre>
+                              </div>
+                              <div>
+                                <span>FLAGS</span>
+                                <strong>{draft.isHidden ? 'HIDDEN' : 'VISIBLE'} / SORT {draft.sortOrder ?? 0}</strong>
+                              </div>
+                            </div>
+                            <div className="case-actions readonly">
+                              <button className="edit-case" type="button" onClick={() => setEditingTestCaseId(testCase.id)}>
+                                Edit Test Case
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </article>
                     );
                   })}
@@ -472,6 +636,8 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
               </section>
             </section>
           )}
+            </section>
+          </section>
         </section>
       </section>
     </main>
