@@ -7,6 +7,23 @@ const getLanguageId = (language) => {
   return judge0Config.languageMap[language];
 };
 
+const normalizeJudge0Status = (status = {}) => {
+  const statusId = Number(status.id || 0);
+  const description = String(status.description || '').toLowerCase();
+
+  if (statusId === 1) return 'queued';
+  if (statusId === 2) return 'processing';
+  if (statusId === 3 || description === 'accepted') return 'accepted';
+  if (statusId === 4 || description === 'wrong answer') return 'wrong_answer';
+  if (statusId === 5 || description === 'time limit exceeded') return 'time_limit_exceeded';
+  if (statusId === 6 || description === 'compilation error') return 'compilation_error';
+  if (statusId >= 7 && statusId <= 12) return 'runtime_error';
+  if (statusId === 13 || description === 'internal error') return 'judge_error';
+  if (statusId === 14 || description === 'exec format error') return 'runtime_error';
+
+  return 'unknown';
+};
+
 const createJudge0Payload = ({ language, sourceCode, stdin = '' }) => {
   const languageId = getLanguageId(language);
 
@@ -85,7 +102,7 @@ const runCode = async ({ language, sourceCode, stdin = '' }) => {
     return {
       payload,
       result: submission,
-      status: submission.status?.description || 'Finished',
+      status: normalizeJudge0Status(submission.status),
     };
   } catch (error) {
     if (!String(error.message).toLowerCase().includes('wait')) {
@@ -102,12 +119,13 @@ const runCode = async ({ language, sourceCode, stdin = '' }) => {
   return {
     payload,
     result,
-    status: result.status?.description || 'Finished',
+    status: normalizeJudge0Status(result.status),
   };
 };
 
 module.exports = {
   createJudge0Payload,
   getLanguageId,
+  normalizeJudge0Status,
   runCode,
 };

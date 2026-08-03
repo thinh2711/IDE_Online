@@ -64,7 +64,7 @@ beforeEach(() => {
         stdout: 'hello\n',
         time: '0.012',
       },
-      status: 'Accepted',
+      status: 'accepted',
     })),
   };
 
@@ -135,7 +135,7 @@ describe('Group 1: submissions service', () => {
       },
     });
 
-    assert.equal(result.status, 'Accepted');
+    assert.equal(result.status, 'accepted');
     assert.equal(result.stdout, 'hello\n');
     assert.equal(result.execution_time, '0.012');
     assert.equal(result.memory_kb, 912);
@@ -152,7 +152,7 @@ describe('Group 1: submissions service', () => {
       stdin: '',
       stdout: 'hello\n',
       stderr: null,
-      status: 'Accepted',
+      status: 'accepted',
       executionTime: '0.012',
       memoryKb: 912,
       judge0Payload: {
@@ -225,7 +225,7 @@ describe('Group 2: submissions controller', () => {
 
     assert.equal(res.statusCode, 201);
     assert.equal(res.body.message, 'Submission executed');
-    assert.equal(res.body.submission.status, 'Accepted');
+    assert.equal(res.body.submission.status, 'accepted');
     assert.equal(next.mock.calls.length, 0);
   });
 });

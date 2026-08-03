@@ -2488,8 +2488,22 @@ textarea::placeholder {
   font-weight: 900;
 }
 
-.console-status .queued {
+.console-status .ready {
+  color: #a3a3a3;
+}
+
+.console-status .queued,
+.console-status .processing {
   color: #fbbf24;
+}
+
+.console-status .wrong_answer,
+.console-status .compilation_error,
+.console-status .runtime_error,
+.console-status .time_limit_exceeded,
+.console-status .judge_error,
+.console-status .unknown {
+  color: #fb7185;
 }
 
 .console-status em {

@@ -132,6 +132,28 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
     setMessage('');
   }
 
+  async function handleOpenSelectedEditor() {
+    if (!selectedQuestionId) {
+      onOpenEditor?.(null);
+      return;
+    }
+
+    setStatus('loading');
+    setMessage('');
+
+    try {
+      const data = await getQuestion(token, selectedQuestionId);
+      setQuestions((current) =>
+        current.map((question) => (question.id === selectedQuestionId ? { ...question, ...data.question } : question))
+      );
+      onOpenEditor?.(data.question);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setStatus('idle');
+    }
+  }
+
   function updateQuestionField(event) {
     setQuestionForm((current) => ({
       ...current,
@@ -338,7 +360,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
           <strong>Backend Portal</strong>
           <nav>
             <button type="button" onClick={onBackToDashboard}>Dashboard</button>
-            <button type="button" onClick={() => onOpenEditor?.(selectedQuestion)}>IDE</button>
+            <button type="button" onClick={handleOpenSelectedEditor}>IDE</button>
             <button className="active" type="button">Challenges</button>
             <button type="button">Community</button>
           </nav>
@@ -406,7 +428,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
                 </div>
               </div>
               <div className="solve-actions">
-                <button className="white-action" type="button" onClick={() => onOpenEditor?.(selectedQuestion)}>
+                <button className="white-action" type="button" onClick={handleOpenSelectedEditor}>
                   <Icon name="play" size={15} /> Open IDE Workspace
                 </button>
               </div>

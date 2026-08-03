@@ -19,6 +19,12 @@ const difficultyClass = {
   medium: 'medium',
 };
 
+const formatRunStatus = (runStatus) => {
+  if (!runStatus) return 'READY';
+
+  return runStatus.replace(/_/g, ' ').toUpperCase();
+};
+
 export function EditorPage({ onBack, question }) {
   const { token, user } = useAuth();
   const [activeCase, setActiveCase] = useState(0);
@@ -42,6 +48,7 @@ export function EditorPage({ onBack, question }) {
   const executionStats = result
     ? `${result.execution_time || '-'}s / ${result.memory_kb || '-'}KB`
     : '- / -';
+  const runStatus = result?.status || 'ready';
 
   useEffect(() => {
     setCurrentQuestion(question);
@@ -197,8 +204,8 @@ export function EditorPage({ onBack, question }) {
                 ))}
               </div>
               <div className="console-status">
-                <span className={result?.status === 'queued' ? 'queued' : 'accepted'}>
-                  <Icon name="checkCircle" size={14} /> {result?.status ? result.status.toUpperCase() : 'READY'}
+                <span className={runStatus}>
+                  <Icon name="checkCircle" size={14} /> {formatRunStatus(result?.status)}
                 </span>
                 <em>{executionStats}</em>
               </div>
