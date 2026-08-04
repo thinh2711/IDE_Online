@@ -25,6 +25,38 @@ const formatRunStatus = (runStatus) => {
   return runStatus.replace(/_/g, ' ').toUpperCase();
 };
 
+const getRunOutput = (runResult) => {
+  if (!runResult) {
+    return {
+      className: '',
+      label: 'Output',
+      text: '(not run yet)',
+    };
+  }
+
+  if (runResult.stdout) {
+    return {
+      className: '',
+      label: 'Output',
+      text: runResult.stdout,
+    };
+  }
+
+  if (runResult.stderr) {
+    return {
+      className: 'error-text',
+      label: 'Error',
+      text: runResult.stderr,
+    };
+  }
+
+  return {
+    className: 'muted-text',
+    label: 'Output',
+    text: '(no stdout)',
+  };
+};
+
 export function EditorPage({ onBack, question }) {
   const { token, user } = useAuth();
   const [activeCase, setActiveCase] = useState(0);
@@ -49,6 +81,7 @@ export function EditorPage({ onBack, question }) {
     ? `${result.execution_time || '-'}s / ${result.memory_kb || '-'}KB`
     : '- / -';
   const runStatus = result?.status || 'ready';
+  const runOutput = getRunOutput(result);
 
   useEffect(() => {
     setCurrentQuestion(question);
@@ -101,6 +134,59 @@ export function EditorPage({ onBack, question }) {
     } finally {
       setStatus('idle');
     }
+  }
+
+  function renderConsolePanel() {
+    if (activeConsoleTab === 'Test Cases') {
+      return (
+        <>
+          <p className="console-kicker">&gt; TEST CASE</p>
+          <div className="console-box">
+            {activeTestCase ? (
+              <>
+                <p><strong>Case:</strong>      #{activeCase + 1}</p>
+                <p><strong>Input:</strong>     <span>{activeTestCase.input || '(empty)'}</span></p>
+                <p><strong>Expected:</strong>  <span>{activeTestCase.expected_output || '(no expected output)'}</span></p>
+              </>
+            ) : (
+              <>
+                <p><strong>Status:</strong>    <span className="muted-text">No visible test cases</span></p>
+                <p><strong>Sample input:</strong> {sampleInput || '(empty)'}</p>
+                <p><strong>Sample output:</strong> {sampleOutput || '(no sample output)'}</p>
+              </>
+            )}
+          </div>
+        </>
+      );
+    }
+
+    if (activeConsoleTab === 'Terminal') {
+      return (
+        <>
+          <p className="console-kicker">:= EXECUTION LOG</p>
+          <div className="console-box muted">
+            {message ? (
+              <p>[API] {message}</p>
+            ) : (
+              <p>[LOG] Workspace is using database question data.</p>
+            )}
+            {result && <p>[SUBMISSION] id={result.id}, status={result.status}, language={result.language}</p>}
+            {result?.stderr && <p>[STDERR] {result.stderr}</p>}
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <p className="console-kicker">&gt; RUN RESULT</p>
+        <div className="console-box">
+          <p><strong>Input:</strong>    {sampleInput || '(empty)'}</p>
+          <p><strong>{runOutput.label}:</strong>   <span className={runOutput.className}>{runOutput.text}</span></p>
+          <p><strong>Expected:</strong> {sampleOutput || '(no expected output)'}</p>
+        </div>
+      </>
+    );
   }
 
   return (
@@ -227,23 +313,7 @@ export function EditorPage({ onBack, question }) {
               </div>
 
               <div className="console-output">
-                <p className="console-kicker">&gt; SESSION DEBUGGER</p>
-                <div className="console-box">
-                  <p><strong>Input:</strong>    {sampleInput || '(empty)'}</p>
-                  <p><strong>Output:</strong>   <span>{result?.stdout || '(not run yet)'}</span></p>
-                  <p><strong>Expected:</strong> {sampleOutput || '(no expected output)'}</p>
-                </div>
-
-                <p className="console-kicker">:= STDOUT</p>
-                <div className="console-box muted">
-                  {message ? (
-                    <p>[API] {message}</p>
-                  ) : (
-                    <p>[LOG] Workspace is using database question data.</p>
-                  )}
-                  {result && <p>[SUBMISSION] id={result.id}, status={result.status}, language={result.language}</p>}
-                  {result?.stderr && <p>[STDERR] {result.stderr}</p>}
-                </div>
+                {renderConsolePanel()}
               </div>
             </div>
           </section>

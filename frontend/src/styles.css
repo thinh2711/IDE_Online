@@ -2592,6 +2592,15 @@ textarea::placeholder {
   font-weight: 900;
 }
 
+.console-box span.error-text {
+  color: #fb7185;
+  white-space: pre-wrap;
+}
+
+.console-box span.muted-text {
+  color: #a3a3a3;
+}
+
 .console-box.muted {
   color: #a3a3a3;
 }

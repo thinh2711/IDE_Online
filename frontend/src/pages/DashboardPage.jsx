@@ -74,8 +74,8 @@ export function DashboardPage({ onManageProblems, onOpenEditor }) {
     <main className="dashboard-shell">
       <header className="dashboard-navbar">
         <div className="dashboard-brand">
-          <span>B</span>
-          <strong>Backend Portal</strong>
+          <span>I</span>
+          <strong>IDE ONLINE</strong>
         </div>
 
         <nav className="dashboard-nav">
@@ -114,7 +114,7 @@ export function DashboardPage({ onManageProblems, onOpenEditor }) {
               </label>
               {isAdmin && (
                 <button className="dashboard-primary" type="button" onClick={onManageProblems}>
-                  <Icon name="plus" size={15} /> NEW TASK
+                  <Icon name="plus" size={15} /> EDIT TASK
                 </button>
               )}
             </div>

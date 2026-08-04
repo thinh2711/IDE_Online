@@ -357,7 +357,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
 
       <section className="admin-console-area">
         <header className="admin-console-topbar">
-          <strong>Backend Portal</strong>
+          <strong>IDE ONLINE</strong>
           <nav>
             <button type="button" onClick={onBackToDashboard}>Dashboard</button>
             <button type="button" onClick={handleOpenSelectedEditor}>IDE</button>
