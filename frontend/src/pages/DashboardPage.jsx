@@ -25,7 +25,7 @@ function normalizeQuestion(question, index) {
   };
 }
 
-export function DashboardPage({ onManageProblems, onOpenEditor }) {
+export function DashboardPage({ onManageProblems, onOpenEditor, onOpenSubmissionHistory }) {
   const { signOut, token, user } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [query, setQuery] = useState('');
@@ -80,9 +80,14 @@ export function DashboardPage({ onManageProblems, onOpenEditor }) {
 
         <nav className="dashboard-nav">
           <button className="active" type="button">DASHBOARD</button>
-          <button type="button" onClick={() => onOpenEditor?.(challengeRows[0] || null)}>IDE</button>
-          <button type="button">CHALLENGES</button>
-          <button type="button">COMMUNITY</button>
+          {isAdmin ? (
+            <>
+              <button type="button" onClick={() => onOpenEditor?.(challengeRows[0] || null)}>IDE</button>
+              <button type="button" onClick={onManageProblems}>CHALLENGES</button>
+            </>
+          ) : (
+            <button type="button" onClick={onOpenSubmissionHistory}>SUBMISSION HISTORY</button>
+          )}
         </nav>
 
         <div className="dashboard-session">

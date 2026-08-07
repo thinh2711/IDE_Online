@@ -362,7 +362,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
             <button type="button" onClick={onBackToDashboard}>Dashboard</button>
             <button type="button" onClick={handleOpenSelectedEditor}>IDE</button>
             <button className="active" type="button">Challenges</button>
-            <button type="button">Community</button>
+            <button disabled type="button">Community</button>
           </nav>
           <div>
             <button type="button" title="Notifications"><Icon name="bell" size={17} /></button>

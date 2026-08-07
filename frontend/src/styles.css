@@ -1453,6 +1453,11 @@ textarea::placeholder {
   color: #ffffff;
 }
 
+.admin-console-topbar nav button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .admin-console-topbar nav button.active::after {
   position: absolute;
   right: 0;
@@ -1613,6 +1618,11 @@ textarea::placeholder {
 .dashboard-nav button:hover,
 .dashboard-nav button.active {
   color: #ffffff;
+}
+
+.dashboard-nav button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .dashboard-nav button.active::after {
@@ -1808,6 +1818,11 @@ textarea::placeholder {
   grid-template-columns: 0.8fr 5.2fr 1.8fr 1.6fr 1.6fr;
   gap: 14px;
   align-items: center;
+}
+
+.submission-history-header,
+.submission-history-row {
+  grid-template-columns: 0.8fr 3.2fr 2fr 1.8fr 2fr;
 }
 
 .challenge-header {
@@ -2062,6 +2077,337 @@ textarea::placeholder {
   background: #34d399;
 }
 
+/* Submission History. */
+.submission-shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background: #0a0a0a;
+  color: #d4d4d4;
+}
+
+.submission-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  background: #0a0a0a;
+  padding: 0 32px;
+}
+
+.submission-main {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  flex: 1;
+  padding: 32px;
+}
+
+.submission-headline {
+  margin-bottom: 24px;
+}
+
+.submission-headline .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.submission-headline h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.submission-filters {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 14px;
+  background: rgba(18, 18, 18, 0.86);
+  backdrop-filter: blur(12px);
+}
+
+.submission-search,
+.submission-select,
+.submission-refresh {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 9px;
+  background: #0a0a0a;
+  color: #d4d4d4;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.78rem;
+}
+
+.submission-search {
+  width: min(100%, 320px);
+  padding: 0 12px;
+}
+
+.submission-search input {
+  width: 100%;
+  color: #d4d4d4;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.submission-select {
+  padding: 0 12px;
+}
+
+.submission-select span {
+  color: #737373;
+}
+
+.submission-select select {
+  color: #d4d4d4;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.submission-refresh {
+  margin-left: auto;
+  border-color: rgba(255, 255, 255, 0.14);
+  padding: 0 14px;
+  background: rgba(38, 38, 38, 0.5);
+}
+
+.submission-refresh:hover {
+  background: #262626;
+  color: #ffffff;
+}
+
+.submission-table {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  background: rgba(18, 18, 18, 0.82);
+}
+
+.submission-table-header,
+.submission-table-row {
+  display: grid;
+  grid-template-columns: 1.35fr 2fr 1.6fr 0.9fr 0.9fr 1fr 1.2fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.submission-table-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 16px 24px;
+  color: #737373;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.submission-table-header span:last-child {
+  text-align: right;
+}
+
+.submission-table-body {
+  display: grid;
+}
+
+.submission-table-row {
+  min-height: 64px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 14px 24px;
+  color: #d4d4d4;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.78rem;
+  transition: background 160ms ease;
+}
+
+.submission-table-row:hover {
+  background: rgba(38, 38, 38, 0.32);
+}
+
+.submission-table-row:last-child {
+  border-bottom: 0;
+}
+
+.submission-table-row strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.submission-table-row button {
+  justify-self: end;
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  padding: 0 11px;
+  background: rgba(38, 38, 38, 0.5);
+  color: #d4d4d4;
+  font-family: inherit;
+  font-size: 0.72rem;
+}
+
+.submission-table-row button:hover {
+  background: #262626;
+  color: #ffffff;
+}
+
+.submission-status-badge {
+  justify-self: start;
+  display: inline-flex;
+  min-height: 27px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  padding: 0 9px;
+  font-size: 0.66rem;
+  font-weight: 950;
+}
+
+.submission-status-badge i {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.submission-status-badge.accepted {
+  border-color: rgba(6, 78, 59, 0.8);
+  background: rgba(6, 78, 59, 0.3);
+  color: #34d399;
+}
+
+.submission-status-badge.error {
+  border-color: rgba(127, 29, 29, 0.8);
+  background: rgba(127, 29, 29, 0.3);
+  color: #f87171;
+}
+
+.submission-status-badge.time-limit {
+  border-color: rgba(120, 53, 15, 0.8);
+  background: rgba(120, 53, 15, 0.3);
+  color: #fbbf24;
+}
+
+.submission-status-badge.neutral {
+  border-color: rgba(64, 64, 64, 0.8);
+  background: rgba(38, 38, 38, 0.6);
+  color: #a3a3a3;
+}
+
+.runtime-warning {
+  color: #fbbf24;
+}
+
+.submission-table-footer,
+.submission-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 16px 24px;
+  color: #737373;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.72rem;
+}
+
+.submission-table-footer > div {
+  display: flex;
+  gap: 8px;
+}
+
+.submission-table-footer button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  background: #111111;
+  color: #a3a3a3;
+}
+
+.submission-code-panel {
+  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  background: rgba(18, 18, 18, 0.82);
+}
+
+.submission-code-panel > div {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 0 16px;
+}
+
+.submission-code-panel .eyebrow {
+  margin: 0;
+}
+
+.submission-code-panel button {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  padding: 6px 10px;
+  background: rgba(38, 38, 38, 0.5);
+  color: #d4d4d4;
+}
+
+.submission-code-panel pre {
+  max-height: 360px;
+  margin: 0;
+  overflow: auto;
+  padding: 18px;
+  color: #e5e5e5;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+.submission-footer {
+  padding: 22px 32px;
+  background: #0a0a0a;
+}
+
+.submission-footer > div {
+  display: flex;
+  gap: 16px;
+}
+
+.submission-footer strong {
+  color: #ffffff;
+}
+
+.submission-footer > span strong {
+  color: #34d399;
+}
+
 /* Core IDE Workspace. */
 .ide-shell {
   display: flex;
@@ -2179,6 +2525,45 @@ textarea::placeholder {
   border-radius: 8px;
   padding: 0 10px;
   background: #111111;
+}
+
+.ide-nav-links {
+  display: flex;
+  min-height: 34px;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.ide-nav-links button {
+  position: relative;
+  border: 0;
+  background: transparent;
+  color: #737373;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ide-nav-links button:hover,
+.ide-nav-links button.active {
+  color: #ffffff;
+}
+
+.ide-nav-links button.active::after {
+  position: absolute;
+  right: 0;
+  bottom: -3px;
+  left: 0;
+  height: 2px;
+  background: #ffffff;
+  content: "";
+}
+
+.ide-nav-links button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .language-select select {
@@ -2746,6 +3131,40 @@ textarea::placeholder {
   .dashboard-session div {
     align-items: flex-start;
     margin-right: auto;
+  }
+
+  .submission-navbar,
+  .submission-filters,
+  .submission-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .submission-navbar {
+    position: static;
+    padding: 14px 18px;
+  }
+
+  .submission-main {
+    padding: 24px 14px 30px;
+  }
+
+  .submission-search {
+    width: 100%;
+  }
+
+  .submission-refresh {
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  .submission-table {
+    overflow-x: auto;
+  }
+
+  .submission-table-header,
+  .submission-table-row {
+    min-width: 920px;
   }
 
   .dashboard-main {

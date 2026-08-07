@@ -56,11 +56,12 @@ const findSubmissionById = async (id) => {
 const findSubmissionsForUser = async ({ userId, role }) => {
   const isAdmin = role === 'admin';
   const result = await pool.query(
-    `SELECT id, user_id, question_id, session_id, language, status,
-       execution_time, memory_kb, created_at
-     FROM submissions
-     WHERE ($1::boolean = true OR user_id = $2)
-     ORDER BY created_at DESC, id DESC
+    `SELECT s.id, s.user_id, s.question_id, s.session_id, s.language, s.status,
+       s.execution_time, s.memory_kb, s.created_at, q.title AS question_title
+     FROM submissions s
+     LEFT JOIN questions q ON q.id = s.question_id
+     WHERE ($1::boolean = true OR s.user_id = $2)
+     ORDER BY s.created_at DESC, s.id DESC
      LIMIT 50`,
     [isAdmin, userId]
   );
