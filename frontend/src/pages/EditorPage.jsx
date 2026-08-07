@@ -25,7 +25,19 @@ const formatRunStatus = (runStatus) => {
   return runStatus.replace(/_/g, ' ').toUpperCase();
 };
 
-const getRunOutput = (runResult) => {
+const normalizeOutput = (value) => {
+  return String(value ?? '').replace(/\r\n/g, '\n').trim();
+};
+
+const getDisplayRunStatus = (runResult, expectedOutput) => {
+  if (!runResult) return 'ready';
+  if (runResult.status !== 'accepted') return runResult.status;
+  if (!String(expectedOutput ?? '').trim()) return runResult.status;
+
+  return normalizeOutput(runResult.stdout) === normalizeOutput(expectedOutput) ? 'accepted' : 'wrong_answer';
+};
+
+const getRunOutput = (runResult, displayStatus) => {
   if (!runResult) {
     return {
       className: '',
@@ -36,7 +48,7 @@ const getRunOutput = (runResult) => {
 
   if (runResult.stdout) {
     return {
-      className: '',
+      className: displayStatus === 'wrong_answer' ? 'error-text' : '',
       label: 'Output',
       text: runResult.stdout,
     };
@@ -66,6 +78,7 @@ export function EditorPage({ onBack, question }) {
   const [currentQuestion, setCurrentQuestion] = useState(question);
   const [testCases, setTestCases] = useState([]);
   const [result, setResult] = useState(null);
+  const [runContext, setRunContext] = useState(null);
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
 
@@ -80,13 +93,16 @@ export function EditorPage({ onBack, question }) {
   const executionStats = result
     ? `${result.execution_time || '-'}s / ${result.memory_kb || '-'}KB`
     : '- / -';
-  const runStatus = result?.status || 'ready';
-  const runOutput = getRunOutput(result);
+  const resultInput = runContext?.input ?? sampleInput;
+  const resultExpectedOutput = runContext?.expectedOutput ?? sampleOutput;
+  const runStatus = getDisplayRunStatus(result, resultExpectedOutput);
+  const runOutput = getRunOutput(result, runStatus);
 
   useEffect(() => {
     setCurrentQuestion(question);
     setActiveCase(0);
     setResult(null);
+    setRunContext(null);
   }, [question]);
 
   useEffect(() => {
@@ -126,6 +142,10 @@ export function EditorPage({ onBack, question }) {
         stdin: sampleInput,
       });
       setResult(data.submission);
+      setRunContext({
+        expectedOutput: sampleOutput,
+        input: sampleInput,
+      });
       setMessage(data.message || 'Run completed.');
       setActiveConsoleTab('Test Result');
     } catch (error) {
@@ -181,9 +201,10 @@ export function EditorPage({ onBack, question }) {
       <>
         <p className="console-kicker">&gt; RUN RESULT</p>
         <div className="console-box">
-          <p><strong>Input:</strong>    {sampleInput || '(empty)'}</p>
+          <p><strong>Verdict:</strong>  <span className={runStatus === 'accepted' ? '' : 'error-text'}>{formatRunStatus(runStatus)}</span></p>
+          <p><strong>Input:</strong>    {resultInput || '(empty)'}</p>
           <p><strong>{runOutput.label}:</strong>   <span className={runOutput.className}>{runOutput.text}</span></p>
-          <p><strong>Expected:</strong> {sampleOutput || '(no expected output)'}</p>
+          <p><strong>Expected:</strong> {resultExpectedOutput || '(no expected output)'}</p>
         </div>
       </>
     );

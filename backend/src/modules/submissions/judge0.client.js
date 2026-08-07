@@ -46,21 +46,52 @@ const createJudge0Payload = ({ language, sourceCode, stdin = '' }) => {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const createJudge0UnavailableError = (message = 'Code runner is temporarily unavailable') => {
+  const error = new Error(message);
+  error.statusCode = 502;
+  error.code = 'JUDGE0_UNAVAILABLE';
+  return error;
+};
+
+const createJudge0TimeoutError = () => {
+  const error = new Error('Code runner timed out. Please try again.');
+  error.statusCode = 504;
+  error.code = 'JUDGE0_TIMEOUT';
+  return error;
+};
+
 const requestJudge0 = async (path, options = {}) => {
-  const response = await fetch(`${judge0Config.baseUrl}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+  let response;
+
+  try {
+    response = await fetch(`${judge0Config.baseUrl}${path}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw createJudge0TimeoutError();
+    }
+
+    throw createJudge0UnavailableError();
+  }
 
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const error = new Error(data.error || data.message || 'Judge0 request failed');
-    error.statusCode = response.status;
-    error.code = 'JUDGE0_ERROR';
+    const upstreamMessage = data.error || data.message || 'Judge0 request failed';
+
+    if ([408, 504].includes(response.status)) {
+      throw createJudge0TimeoutError();
+    }
+
+    const error = createJudge0UnavailableError(upstreamMessage.toLowerCase().includes('wait')
+      ? upstreamMessage
+      : 'Code runner is temporarily unavailable');
+    error.upstreamStatusCode = response.status;
     throw error;
   }
 
@@ -84,10 +115,7 @@ const pollSubmission = async (token) => {
     await sleep(POLL_INTERVAL_MS);
   }
 
-  const error = new Error('Judge0 execution timed out');
-  error.statusCode = 504;
-  error.code = 'JUDGE0_TIMEOUT';
-  throw error;
+  throw createJudge0TimeoutError();
 };
 
 const runCode = async ({ language, sourceCode, stdin = '' }) => {

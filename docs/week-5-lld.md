@@ -198,7 +198,7 @@ Content-Type: application/json
 
 ```json
 {
-  "message": "Submission skeleton created",
+  "message": "Submission executed",
   "submission": {
     "id": 12,
     "user_id": 1,
@@ -207,17 +207,25 @@ Content-Type: application/json
     "language": "javascript",
     "source_code": "console.log('hello')",
     "stdin": "",
-    "stdout": null,
+    "stdout": "hello\n",
     "stderr": null,
-    "status": "queued",
-    "execution_time": null,
-    "memory_kb": null,
+    "status": "accepted",
+    "execution_time": "0.012",
+    "memory_kb": 912,
+    "judge0_payload": {
+      "language_id": 63,
+      "source_code": "console.log('hello')",
+      "stdin": "",
+      "cpu_time_limit": 10,
+      "wall_time_limit": 15,
+      "memory_limit": 262144
+    },
     "created_at": "2026-07-27T02:00:00.000Z"
   }
 }
 ```
 
-Tuần 6 response sẽ đổi sang result thật từ Judge0, ví dụ `accepted`, `wrong_answer`, `compilation_error`, `runtime_error`, `time_limit_exceeded`.
+Tuần 6 đã trả result thật từ Judge0. App status được chuẩn hóa thành `accepted`, `wrong_answer`, `compilation_error`, `runtime_error`, `time_limit_exceeded`, `judge_error`, `queued`, `processing`, hoặc `unknown`.
 
 ## 3. Status Codes And Error Codes
 
@@ -231,7 +239,8 @@ Tuần 6 response sẽ đổi sang result thật từ Judge0, ví dụ `accepted
 | 404   | `SUBMISSION_NOT_FOUND`    | Không tìm thấy submission |
 | 413   | `PAYLOAD_TOO_LARGE`       | Source code hoặc stdin vượt giới hạn |
 | 429   | `RATE_LIMITED`            | User chạy code quá nhiều trong thời gian ngắn |
-| 502   | `JUDGE0_UNAVAILABLE`      | Judge0 timeout, connection refused hoặc lỗi upstream |
+| 502   | `JUDGE0_UNAVAILABLE`      | Judge0 connection refused hoặc lỗi upstream |
+| 504   | `JUDGE0_TIMEOUT`          | Judge0 không trả kết quả trong thời gian cho phép |
 | 500   | `INTERNAL_ERROR`          | Lỗi không mong muốn |
 
 Response lỗi chuẩn:
@@ -262,14 +271,18 @@ sequenceDiagram
   API->>API: Verify JWT + RBAC
   API->>API: Validate body and payload size
   API->>DB: Check question if provided
-  API->>DB: Insert submission status=queued
-  API->>J: Submit sourceCode + stdin + limits
+  API->>J: Submit sourceCode + stdin + limits, wait=true
+  alt wait=true unsupported
+    API->>J: Submit wait=false
+    API->>J: Poll by token until finished
+  end
   J-->>API: stdout/stderr/status/time/memory
-  API->>DB: Update submission result
+  API->>API: Normalize Judge0 status
+  API->>DB: Insert submission result
   API-->>C: Sanitized submission result
 ```
 
-Tuần 5 skeleton dừng ở bước insert `queued`. Tuần 6 sẽ thêm Judge0 call và update result.
+Tuần 6 implementation hiện tại gọi Judge0 trước, sau đó insert submission cùng result cuối vào PostgreSQL. Cách này đơn giản cho MVP nhưng chưa phù hợp nếu muốn queue bất đồng bộ ở scale lớn.
 
 ### Admin Test Case Management
 
@@ -317,6 +330,15 @@ sequenceDiagram
 4. `errorHandler` trả response lỗi chuẩn `{ error: { code, message } }`.
 5. Lỗi Judge0 được map sang lỗi thân thiện, không trả raw stack trace cho client.
 
+Judge0 error mapping tuần 6:
+
+| Upstream failure | API error |
+| --- | --- |
+| Network/DNS/connection refused | `502 JUDGE0_UNAVAILABLE` |
+| Upstream 5xx | `502 JUDGE0_UNAVAILABLE` |
+| Timeout hoặc polling vượt giới hạn | `504 JUDGE0_TIMEOUT` |
+| Unsupported app language | `400 UNSUPPORTED_LANGUAGE` |
+
 ## 7. Logging Strategy
 
 Log nên có:
@@ -357,3 +379,25 @@ Không log:
 | Có error/logging strategy       | [x] |
 | Có security checklist           | [x] |
 | Skeleton code khớp API spec     | [x] |
+
+## 10. Week 6 Implementation Update
+
+Tuần 6 đã implement core flow:
+
+1. Frontend IDE gửi `POST /api/submissions/run`.
+2. Backend validate request và kiểm tra question nếu có `questionId`.
+3. Backend gọi Judge0 với `wait=true`.
+4. Nếu Judge0 không hỗ trợ `wait=true`, backend fallback sang `wait=false` và polling token.
+5. Backend normalize status rồi lưu submission vào PostgreSQL.
+6. Frontend hiển thị status, stdout, stderr, time và memory.
+
+Manual/API test đề xuất:
+
+```bash
+curl -X POST http://localhost:3000/api/submissions/run \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"language":"javascript","sourceCode":"console.log(\"hello\")","stdin":"","questionId":1}'
+```
+
+Kỳ vọng response có `message: "Submission executed"` và `submission.status` là app status đã chuẩn hóa.

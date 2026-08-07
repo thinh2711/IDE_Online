@@ -26,6 +26,7 @@ docs/
   week-3-requirements.md
   week-4-hld.md
   week-5-lld.md
+  week-6-implementation.md
   week-7-case-study.md
   week-8-final-report.md
 ```
