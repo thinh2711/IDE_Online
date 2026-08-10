@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { listQuestions } from '../api/questions';
+import { createSession } from '../api/sessions';
 import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -25,7 +26,7 @@ function normalizeQuestion(question, index) {
   };
 }
 
-export function DashboardPage({ onManageProblems, onOpenEditor, onOpenSubmissionHistory }) {
+export function DashboardPage({ onManageProblems, onOpenEditor, onOpenReviewSession, onOpenSubmissionHistory }) {
   const { signOut, token, user } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [query, setQuery] = useState('');
@@ -33,6 +34,7 @@ export function DashboardPage({ onManageProblems, onOpenEditor, onOpenSubmission
   const [message, setMessage] = useState('');
 
   const isAdmin = user?.role === 'admin';
+  const isViewer = user?.role === 'viewer';
 
   useEffect(() => {
     refreshQuestions().catch(() => {});
@@ -45,6 +47,23 @@ export function DashboardPage({ onManageProblems, onOpenEditor, onOpenSubmission
     try {
       const data = await listQuestions(token);
       setQuestions(data.questions || []);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setStatus('idle');
+    }
+  }
+
+  async function handleCreateSession(question) {
+    setStatus('loading');
+    setMessage('');
+
+    try {
+      const data = await createSession(token, {
+        questionId: question.id,
+      });
+      setMessage(`Session ${data.session.join_code} created for ${question.title}.`);
+      onOpenEditor?.(question, data.session);
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -139,9 +158,20 @@ export function DashboardPage({ onManageProblems, onOpenEditor, onOpenSubmission
               </span>
               <span className="challenge-acceptance">{question.acceptance}</span>
               <div className="challenge-action">
-                <button type="button" onClick={() => onOpenEditor?.(question)}>
-                  Solve <Icon name="arrowRight" size={14} />
-                </button>
+                {isViewer ? (
+                  <button type="button" onClick={() => onOpenReviewSession?.()}>
+                    Review <Icon name="users" size={14} />
+                  </button>
+                ) : (
+                  <>
+                    <button type="button" onClick={() => onOpenEditor?.(question)}>
+                      Solve <Icon name="arrowRight" size={14} />
+                    </button>
+                    <button type="button" onClick={() => handleCreateSession(question)} disabled={status === 'loading'}>
+                      Session <Icon name="users" size={14} />
+                    </button>
+                  </>
+                )}
               </div>
             </article>
           ))}
@@ -182,6 +212,7 @@ export function DashboardPage({ onManageProblems, onOpenEditor, onOpenSubmission
           <h2>QUICK NAVIGATION</h2>
           <div>
             <button type="button" onClick={onOpenSubmissionHistory}><Icon name="folder" size={16} /> MY SUBMISSIONS</button>
+            <button type="button" onClick={() => onOpenReviewSession?.()}><Icon name="users" size={16} /> REVIEW SESSION</button>
             <button type="button"><Icon name="users" size={16} /> TEAM RANKINGS</button>
             <button type="button"><Icon name="zap" size={16} /> DAILY CHALLENGE</button>
             <button type="button"><Icon name="book" size={16} /> DOCUMENTATION</button>
@@ -255,6 +286,7 @@ export function DashboardPage({ onManageProblems, onOpenEditor, onOpenSubmission
         <nav className="dashboard-nav">
           <button className="active" type="button">DASHBOARD</button>
           <button type="button" onClick={onOpenSubmissionHistory}>SUBMISSION HISTORY</button>
+          <button type="button" onClick={() => onOpenReviewSession?.()}>REVIEW SESSION</button>
         </nav>
 
         <div className="dashboard-session">
@@ -338,9 +370,20 @@ export function DashboardPage({ onManageProblems, onOpenEditor, onOpenSubmission
                 </span>
                 <span className="challenge-acceptance">{question.acceptance}</span>
                 <div className="challenge-action">
-                  <button type="button" onClick={() => onOpenEditor?.(question)}>
-                    Solve <Icon name="arrowRight" size={14} />
-                  </button>
+                  {isViewer ? (
+                    <button type="button" onClick={() => onOpenReviewSession?.()}>
+                      Review <Icon name="users" size={14} />
+                    </button>
+                  ) : (
+                    <>
+                      <button type="button" onClick={() => onOpenEditor?.(question)}>
+                        Solve <Icon name="arrowRight" size={14} />
+                      </button>
+                      <button type="button" onClick={() => handleCreateSession(question)} disabled={status === 'loading'}>
+                        Session <Icon name="users" size={14} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </article>
             ))}
@@ -380,7 +423,8 @@ export function DashboardPage({ onManageProblems, onOpenEditor, onOpenSubmission
           <article className="quick-navigation">
             <h2>QUICK NAVIGATION</h2>
             <div>
-              <button type="button"><Icon name="folder" size={16} /> MY SUBMISSIONS</button>
+              <button type="button" onClick={onOpenSubmissionHistory}><Icon name="folder" size={16} /> MY SUBMISSIONS</button>
+              <button type="button" onClick={() => onOpenReviewSession?.()}><Icon name="users" size={16} /> REVIEW SESSION</button>
               <button type="button"><Icon name="users" size={16} /> TEAM RANKINGS</button>
               <button type="button"><Icon name="zap" size={16} /> DAILY CHALLENGE</button>
               <button type="button"><Icon name="book" size={16} /> DOCUMENTATION</button>

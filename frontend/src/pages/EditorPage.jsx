@@ -69,7 +69,7 @@ const getRunOutput = (runResult, displayStatus) => {
   };
 };
 
-export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpenSubmissionHistory, question }) {
+export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpenSubmissionHistory, question, session = null }) {
   const { signOut, token, user } = useAuth();
   const [activeCase, setActiveCase] = useState(0);
   const [activeConsoleTab, setActiveConsoleTab] = useState('Test Cases');
@@ -138,6 +138,7 @@ export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpen
       const data = await runSubmission(token, {
         language,
         questionId: currentQuestion?.id || null,
+        sessionId: session?.id || null,
         sourceCode: code,
         stdin: sampleInput,
       });
@@ -227,7 +228,7 @@ export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpen
           <button className="icon-button" type="button" onClick={onBack} title="Back to problem bank">
             <Icon name="arrowLeft" size={18} />
           </button>
-          <span className="live-badge"><i /> LIVE SESSION</span>
+          <span className="live-badge"><i /> {session?.join_code ? `JOIN ${session.join_code}` : 'LOCAL RUN'}</span>
           <button className="run-button" type="button" onClick={handleRun} disabled={status === 'running'}>
             <Icon name="play" size={15} /> {status === 'running' ? 'Running' : 'Run'}
           </button>

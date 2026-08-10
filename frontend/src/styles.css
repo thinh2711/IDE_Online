@@ -5339,3 +5339,135 @@ button.white-action[type="submit"],
   font-size: 0.76rem;
   outline: 0;
 }
+
+.challenge-action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reviewer-session-shell {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #111827;
+}
+
+.reviewer-session-main {
+  display: grid;
+  gap: 20px;
+  padding: 28px;
+}
+
+.reviewer-session-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 18px;
+}
+
+.reviewer-session-hero h1 {
+  margin: 6px 0 12px;
+  color: #111827;
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.reviewer-join-form {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+.reviewer-join-form label {
+  display: grid;
+  gap: 7px;
+}
+
+.reviewer-join-form span {
+  color: #6b7280;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.reviewer-join-form input {
+  min-height: 40px;
+  width: 180px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: #111827;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.danger-action {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  padding: 0 14px;
+  background: #fef2f2;
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.reviewer-session-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 18px;
+}
+
+.reviewer-session-side {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.reviewer-submission-row {
+  display: grid;
+  gap: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 0;
+}
+
+.reviewer-submission-row strong {
+  color: #111827;
+}
+
+.reviewer-submission-row span {
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.reviewer-submission-row pre {
+  overflow: auto;
+  max-height: 120px;
+  margin: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 10px;
+  background: #f9fafb;
+  color: #111827;
+}
+
+@media (max-width: 900px) {
+  .reviewer-session-hero,
+  .reviewer-session-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reviewer-join-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .reviewer-join-form input {
+    width: 100%;
+  }
+}

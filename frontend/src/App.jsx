@@ -5,39 +5,61 @@ import { AuthPage } from './pages/AuthPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { EditorPage } from './pages/EditorPage';
 import { QuestionBankPage } from './pages/QuestionBankPage';
+import { ReviewerSessionPage } from './pages/ReviewerSessionPage';
 import { SubmissionDetailPage } from './pages/SubmissionDetailPage';
 import { SubmissionHistoryPage } from './pages/SubmissionHistoryPage';
 
 function AppContent() {
   const { isAuthenticated, user } = useAuth();
+  const [activeCodingSession, setActiveCodingSession] = useState(null);
   const [activeQuestion, setActiveQuestion] = useState(null);
   const [activeSubmissionId, setActiveSubmissionId] = useState(null);
+  const [reviewJoinCode, setReviewJoinCode] = useState('');
   const [view, setView] = useState('dashboard');
 
   useEffect(() => {
     if (!isAuthenticated) return;
 
     setActiveQuestion(null);
+    setActiveCodingSession(null);
     setActiveSubmissionId(null);
+    setReviewJoinCode('');
     setView('dashboard');
   }, [isAuthenticated, user?.id, user?.role]);
 
   const openDashboard = () => {
     setActiveQuestion(null);
+    setActiveCodingSession(null);
     setActiveSubmissionId(null);
     setView('dashboard');
   };
 
   const openChallenges = () => {
     setActiveQuestion(null);
+    setActiveCodingSession(null);
     setActiveSubmissionId(null);
     setView('admin');
   };
 
   const openSubmissionHistory = () => {
     setActiveQuestion(null);
+    setActiveCodingSession(null);
     setActiveSubmissionId(null);
     setView('submissions');
+  };
+
+  const openEditor = (question, session = null) => {
+    setActiveCodingSession(session);
+    setActiveQuestion(question);
+    setActiveSubmissionId(null);
+  };
+
+  const openReviewSession = (joinCode = '') => {
+    setActiveQuestion(null);
+    setActiveCodingSession(null);
+    setActiveSubmissionId(null);
+    setReviewJoinCode(joinCode);
+    setView('reviewSession');
   };
 
   if (!isAuthenticated) {
@@ -48,7 +70,11 @@ function AppContent() {
     return (
       <EditorPage
         question={activeQuestion}
-        onBack={() => setActiveQuestion(null)}
+        session={activeCodingSession}
+        onBack={() => {
+          setActiveQuestion(null);
+          setActiveCodingSession(null);
+        }}
         onBackToDashboard={openDashboard}
         onOpenSubmissionHistory={openSubmissionHistory}
       />
@@ -61,7 +87,16 @@ function AppContent() {
         id={activeSubmissionId}
         onBackToDashboard={openDashboard}
         onBackToHistory={openSubmissionHistory}
-        onOpenEditor={setActiveQuestion}
+        onOpenEditor={openEditor}
+      />
+    );
+  }
+
+  if (view === 'reviewSession') {
+    return (
+      <ReviewerSessionPage
+        initialJoinCode={reviewJoinCode}
+        onBackToDashboard={openDashboard}
       />
     );
   }
@@ -80,7 +115,7 @@ function AppContent() {
     return (
       <QuestionBankPage
         onBackToDashboard={openDashboard}
-        onOpenEditor={setActiveQuestion}
+        onOpenEditor={openEditor}
         onOpenSubmissionHistory={openSubmissionHistory}
       />
     );
@@ -89,7 +124,8 @@ function AppContent() {
   return (
     <DashboardPage
       onManageProblems={openChallenges}
-      onOpenEditor={setActiveQuestion}
+      onOpenEditor={openEditor}
+      onOpenReviewSession={openReviewSession}
       onOpenSubmissionHistory={openSubmissionHistory}
     />
   );
