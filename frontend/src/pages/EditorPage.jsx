@@ -70,7 +70,7 @@ const getRunOutput = (runResult, displayStatus) => {
 };
 
 export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpenSubmissionHistory, question }) {
-  const { token, user } = useAuth();
+  const { signOut, token, user } = useAuth();
   const [activeCase, setActiveCase] = useState(0);
   const [activeConsoleTab, setActiveConsoleTab] = useState('Test Cases');
   const [code, setCode] = useState(defaultCode);
@@ -212,29 +212,22 @@ export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpen
 
   return (
     <main className="ide-shell">
-      <header className="ide-navbar">
-        <div className="ide-nav-left">
+      <header className="dashboard-navbar ide-navbar">
+        <div className="dashboard-brand">
+          <span>I</span>
+          <strong>IDE ONLINE</strong>
+        </div>
+
+        <nav className="dashboard-nav" aria-label="Workspace navigation">
+          <button type="button" onClick={onBackToDashboard}>DASHBOARD</button>
+          <button type="button" onClick={onOpenSubmissionHistory}>SUBMISSION HISTORY</button>
+        </nav>
+
+        <div className="dashboard-session ide-session">
           <button className="icon-button" type="button" onClick={onBack} title="Back to problem bank">
             <Icon name="arrowLeft" size={18} />
           </button>
-          <h1>{title}</h1>
           <span className="live-badge"><i /> LIVE SESSION</span>
-        </div>
-
-        <nav className="ide-nav-links" aria-label="Workspace navigation">
-          <button type="button" onClick={onBackToDashboard}>Dashboard</button>
-          <button type="button" onClick={onOpenSubmissionHistory}>Submission History</button>
-        </nav>
-
-        <label className="language-select">
-          <select value={language} onChange={(event) => setLanguage(event.target.value)}>
-            {languageOptions.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
-        </label>
-
-        <div className="ide-nav-actions">
           <button className="run-button" type="button" onClick={handleRun} disabled={status === 'running'}>
             <Icon name="play" size={15} /> {status === 'running' ? 'Running' : 'Run'}
           </button>
@@ -244,7 +237,9 @@ export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpen
           <button className="icon-button" type="button" title="Settings">
             <Icon name="settings" size={17} />
           </button>
-          <span className="ide-avatar">{user?.username?.slice(0, 1)?.toUpperCase() || 'U'}</span>
+          <button className="dashboard-avatar ide-avatar" type="button" onClick={signOut} title="Sign out">
+            {user?.username?.slice(0, 1)?.toUpperCase() || 'U'}
+          </button>
         </div>
       </header>
 
@@ -283,6 +278,13 @@ export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpen
                 <span />
               </div>
               <div className="editor-tools">
+                <label className="language-select">
+                  <select value={language} onChange={(event) => setLanguage(event.target.value)}>
+                    {languageOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
                 <button type="button" title="History"><Icon name="clock" size={16} /></button>
                 <button type="button" title="Fullscreen"><Icon name="maximize" size={16} /></button>
               </div>

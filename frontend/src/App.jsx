@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
 import { AuthPage } from './pages/AuthPage';
@@ -9,10 +9,18 @@ import { SubmissionDetailPage } from './pages/SubmissionDetailPage';
 import { SubmissionHistoryPage } from './pages/SubmissionHistoryPage';
 
 function AppContent() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [activeQuestion, setActiveQuestion] = useState(null);
   const [activeSubmissionId, setActiveSubmissionId] = useState(null);
   const [view, setView] = useState('dashboard');
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    setActiveQuestion(null);
+    setActiveSubmissionId(null);
+    setView('dashboard');
+  }, [isAuthenticated, user?.id, user?.role]);
 
   const openDashboard = () => {
     setActiveQuestion(null);

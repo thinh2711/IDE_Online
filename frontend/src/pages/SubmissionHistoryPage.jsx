@@ -137,11 +137,9 @@ export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpe
             </button>
 
             <nav className="admin-side-nav" aria-label="Admin navigation">
-              <button type="button"><Icon name="terminal" size={16} /> Overview</button>
+              <button type="button" onClick={onBackToDashboard}><Icon name="terminal" size={16} /> Overview</button>
               <button type="button" onClick={onOpenProblems}><Icon name="folder" size={16} /> Manage Problems</button>
-              <button type="button" onClick={onOpenProblems}><Icon name="settings" size={16} /> Test Cases</button>
               <button className="active" type="button"><Icon name="clock" size={16} /> Submissions</button>
-              <button type="button"><Icon name="chart" size={16} /> Analytics</button>
             </nav>
           </div>
 

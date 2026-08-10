@@ -8,6 +8,497 @@
   text-rendering: optimizeLegibility;
 }
 
+/* Lumina Terminal Light Mode overrides. */
+:root {
+  color: #1a1c1c;
+  background: #ffffff;
+}
+
+body {
+  background: #ffffff;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+.app-shell,
+.dashboard-shell,
+.admin-console-shell,
+.submission-shell,
+.submission-detail-shell,
+.ide-shell {
+  background: #ffffff;
+  color: #1a1c1c;
+}
+
+.app-shell {
+  background:
+    linear-gradient(#e5e7eb 1px, transparent 1px),
+    linear-gradient(90deg, #e5e7eb 1px, transparent 1px),
+    #ffffff;
+  background-size: 56px 56px;
+}
+
+.app-shell::before {
+  opacity: 0;
+}
+
+.portal-header h1,
+.card-header h2,
+.dashboard-brand strong,
+.dashboard-headline h1,
+.dashboard-stats strong,
+.challenge-title strong,
+.system-logs h2,
+.quick-navigation h2,
+.admin-identity-card strong,
+.admin-console-topbar > strong,
+.admin-question-index h2,
+.question-detail h2,
+.admin-form h2,
+.admin-console-topbar .admin-avatar,
+.submission-headline h1,
+.submission-table-row strong,
+.submission-footer strong,
+.submission-detail-heading h1,
+.submission-metric-grid strong,
+.admin-submission-heading h1,
+.admin-submission-logo strong,
+.admin-submission-table-row strong,
+.problem-scroll h2,
+.ide-nav-left h1,
+.editor-tab {
+  color: #000000;
+}
+
+.portal-header p,
+.card-header p,
+.field small,
+.dashboard-session span,
+.dashboard-session em,
+.dashboard-nav button,
+.eyebrow,
+.dashboard-stats span,
+.challenge-header,
+.challenge-title em,
+.challenge-acceptance,
+.challenge-footer,
+.dashboard-footer,
+.system-logs div,
+.quick-navigation button,
+.admin-identity-card em,
+.admin-side-nav button,
+.admin-side-footer button,
+.admin-console-topbar nav button,
+.workspace-message,
+.question-row em,
+.test-case-row strong,
+.panel-heading p,
+.submission-table-header,
+.submission-table-row,
+.submission-table-footer,
+.submission-footer,
+.submission-select span,
+.submission-search,
+.submission-back-link,
+.source-viewer-pane header em,
+.execution-log-pane p,
+.admin-submission-context em,
+.admin-submission-table-header,
+.admin-submission-table-row,
+.admin-submission-footer,
+.pane-label,
+.problem-scroll,
+.console-status,
+.console-kicker,
+.console-box strong,
+.ide-statusbar {
+  color: #6b7280;
+}
+
+.auth-card,
+.session-debugger,
+.preview-tabs,
+.dashboard-navbar,
+.dashboard-stats article,
+.challenge-table,
+.system-logs,
+.quick-navigation,
+.admin-console-sidebar,
+.admin-identity-card,
+.admin-console-topbar,
+.admin-question-index,
+.question-detail,
+.admin-form,
+.workspace-message,
+.question-row,
+.test-case-row,
+.spec-card,
+.submission-navbar,
+.submission-filters,
+.submission-table,
+.submission-code-panel,
+.submission-footer,
+.submission-detail-heading > div:first-child span,
+.source-viewer-pane,
+.execution-log-pane,
+.submission-metric-grid article,
+.admin-submission-sidebar,
+.admin-submission-topbar,
+.admin-submission-filters,
+.admin-submission-table,
+.admin-submission-footer,
+.problem-pane,
+.editor-pane,
+.console-pane,
+.example-box,
+.console-box,
+.language-select,
+.code-editor {
+  border-color: #e5e7eb;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.dashboard-main,
+.admin-console-content,
+.submission-main,
+.submission-detail-main,
+.admin-submission-main,
+.problem-scroll,
+.source-viewer-body,
+.execution-log-pane > div,
+.console-body,
+.code-editor textarea,
+.line-numbers,
+.source-line-numbers {
+  background: #ffffff;
+}
+
+.dashboard-navbar,
+.admin-console-topbar,
+.submission-navbar,
+.admin-submission-topbar,
+.editor-toolbar,
+.console-toolbar,
+.source-viewer-pane header,
+.execution-log-pane header,
+.challenge-header,
+.submission-table-header,
+.admin-submission-table-header,
+.ide-statusbar,
+.pane-label {
+  border-color: #e5e7eb;
+  background: #fafafa;
+}
+
+.logo-badge,
+.dashboard-brand span,
+.admin-identity-card > span,
+.admin-submission-logo span {
+  border-color: #000000;
+  border-radius: 4px;
+  background: #000000;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.preview-tabs,
+.auth-card,
+.input-shell,
+.session-debugger,
+.debug-row,
+.dashboard-navbar,
+.dashboard-stats article,
+.challenge-table,
+.system-logs,
+.quick-navigation,
+.admin-console-sidebar,
+.admin-identity-card,
+.admin-new-problem,
+.admin-side-nav button,
+.admin-side-footer button,
+.admin-console-topbar,
+.admin-question-index,
+.question-detail,
+.admin-form,
+.workspace-message,
+.question-row,
+.test-case-row,
+.spec-card,
+.submission-navbar,
+.submission-filters,
+.submission-search,
+.submission-select,
+.submission-refresh,
+.submission-table,
+.submission-table-row button,
+.submission-status-badge,
+.submission-table-footer button,
+.submission-code-panel,
+.submission-detail-heading > div:first-child span,
+.submission-detail-heading button,
+.source-viewer-pane,
+.source-viewer-pane header em,
+.execution-log-pane,
+.execution-log-pane pre,
+.submission-metric-grid article,
+.admin-submission-filters,
+.admin-submission-filters input,
+.admin-submission-filters select,
+.admin-submission-table,
+.admin-submission-table footer button,
+.admin-submission-footer,
+.problem-pane,
+.editor-pane,
+.console-pane,
+.example-box,
+.console-box,
+.language-select,
+.run-button,
+.submit-button,
+.ide-avatar,
+.ide-nav-links button,
+.case-tabs button,
+.console-tabs button,
+.problem-tags span,
+.difficulty-tag,
+.challenge-difficulty,
+.challenge-action button {
+  border-radius: 4px;
+}
+
+.input-shell,
+.dashboard-search,
+.submission-search,
+.submission-select,
+.admin-submission-filters input,
+.admin-submission-filters select,
+.language-select,
+.console-box,
+.example-box,
+.code-editor,
+.source-viewer-body,
+.execution-log-pane pre,
+.admin-form input,
+.admin-form select,
+.admin-form textarea,
+.inline-actions select {
+  border-color: #e5e7eb;
+  background: #fafafa;
+  color: #1a1c1c;
+}
+
+input,
+select,
+textarea {
+  color: #1a1c1c;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+}
+
+.primary-button,
+.dashboard-primary,
+.admin-new-problem,
+.submit-button,
+.submission-detail-heading button.primary,
+.admin-submission-filters button {
+  border-color: #000000;
+  background: #000000;
+  color: #ffffff;
+}
+
+.primary-button:hover,
+.dashboard-primary:hover,
+.admin-new-problem:hover,
+.submit-button:hover,
+.submission-detail-heading button.primary:hover,
+.admin-submission-filters button:hover {
+  background: #1f2937;
+  color: #ffffff;
+}
+
+.secondary-button,
+.run-button,
+.submission-refresh,
+.submission-table-row button,
+.submission-detail-heading button,
+.submission-code-panel button,
+.challenge-action button,
+.inline-actions button,
+.panel-heading button,
+.admin-form button,
+.test-case-row button,
+.workspace-user span,
+.workspace-user strong,
+.workspace-user button {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #000000;
+}
+
+.secondary-button:hover,
+.run-button:hover,
+.submission-refresh:hover,
+.submission-table-row button:hover,
+.submission-detail-heading button:hover,
+.submission-code-panel button:hover,
+.challenge-action button:hover,
+.admin-side-nav button:hover,
+.admin-side-footer button:hover,
+.quick-navigation button:hover,
+.question-row:hover,
+.challenge-row:hover,
+.submission-table-row:hover,
+.admin-submission-table-row:hover,
+.test-case-row:hover {
+  background: #fafafa;
+  color: #000000;
+}
+
+.preview-tabs button.active,
+.dashboard-nav button.active,
+.admin-console-topbar nav button.active,
+.ide-nav-links button.active,
+.console-tabs button.active,
+.admin-side-nav button.active,
+.question-row.active,
+.case-tabs button.active,
+.case-tabs button:hover {
+  color: #8b5cf6;
+}
+
+.dashboard-nav button.active::after,
+.admin-console-topbar nav button.active::after,
+.ide-nav-links button.active::after,
+.console-tabs button.active,
+.admin-side-nav button.active::before {
+  border-color: #8b5cf6;
+  background: #8b5cf6;
+}
+
+.admin-side-nav button.active,
+.question-row.active {
+  border-color: #ddd6fe;
+  background: #f5f3ff;
+}
+
+.challenge-header,
+.challenge-row,
+.submission-table-header,
+.submission-table-row,
+.admin-submission-table-header,
+.admin-submission-table-row,
+.admin-submission-table footer,
+.submission-table-footer,
+.admin-console-topbar,
+.submission-navbar,
+.dashboard-navbar,
+.editor-toolbar,
+.console-toolbar,
+.pane-label,
+.ide-statusbar,
+.source-viewer-pane header,
+.execution-log-pane header {
+  border-color: #e5e7eb;
+}
+
+.challenge-status.solved,
+.console-status .accepted,
+.console-box span,
+.submission-status-badge.accepted,
+.problem-tags .difficulty-tag.easy,
+.challenge-difficulty.easy,
+.execution-log-pane pre.success,
+.dashboard-footer strong,
+.submission-footer > span strong,
+.system-logs .ok {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.console-status .wrong_answer,
+.console-status .compilation_error,
+.console-status .runtime_error,
+.console-status .judge_error,
+.console-status .unknown,
+.console-box span.error-text,
+.submission-status-badge.error,
+.execution-log-pane pre.error,
+.spec-card .danger,
+.challenge-difficulty.hard {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.console-status .queued,
+.console-status .processing,
+.console-status .time_limit_exceeded,
+.submission-status-badge.time-limit,
+.runtime-warning,
+.problem-tags .difficulty-tag.medium,
+.challenge-difficulty.medium {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.problem-tags span,
+.difficulty-tag,
+.challenge-difficulty,
+.submission-status-badge,
+.live-badge {
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+  color: #6b7280;
+}
+
+.live-badge i {
+  background: #8b5cf6;
+  box-shadow: 0 0 0 5px rgba(139, 92, 246, 0.12);
+}
+
+.dashboard-avatar,
+.admin-console-topbar .admin-avatar,
+.ide-avatar,
+.admin-submission-user i {
+  border-color: #e5e7eb;
+  background: #fafafa;
+  color: #000000;
+}
+
+.code-editor,
+.source-viewer-body,
+.console-box,
+.example-box,
+.execution-log-pane pre,
+.submission-code-panel pre {
+  background: #fafafa;
+  color: #1a1c1c;
+}
+
+.code-editor textarea,
+.source-viewer-body pre,
+.submission-code-panel pre {
+  color: #1a1c1c;
+}
+
+.line-numbers,
+.source-line-numbers {
+  border-color: #e5e7eb;
+  color: #9ca3af;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -4014,4 +4505,803 @@ textarea::placeholder {
     border-bottom: 1px solid rgba(255, 255, 255, 0.09);
     padding: 8px;
   }
+}
+
+/* Lumina Terminal Light Mode final cascade. Keep this block last. */
+:root {
+  color: #1a1c1c !important;
+  background: #ffffff !important;
+  font-family:
+    Geist, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body,
+.app-shell,
+.dashboard-shell,
+.admin-console-shell,
+.submission-shell,
+.submission-detail-shell,
+.ide-shell {
+  background: #ffffff !important;
+  color: #1a1c1c !important;
+}
+
+.app-shell {
+  background:
+    linear-gradient(#f3f4f6 1px, transparent 1px),
+    linear-gradient(90deg, #f3f4f6 1px, transparent 1px),
+    #ffffff !important;
+  background-size: 56px 56px !important;
+}
+
+.app-shell::before {
+  opacity: 0 !important;
+}
+
+.portal-header h1,
+.card-header h2,
+.dashboard-brand strong,
+.dashboard-headline h1,
+.dashboard-stats strong,
+.challenge-title strong,
+.system-logs h2,
+.quick-navigation h2,
+.admin-identity-card strong,
+.admin-console-topbar > strong,
+.admin-question-index h2,
+.question-detail h2,
+.admin-form h2,
+.submission-headline h1,
+.submission-detail-heading h1,
+.submission-metric-grid strong,
+.admin-submission-heading h1,
+.problem-scroll h2,
+.ide-nav-left h1,
+.editor-tab,
+.submission-table-row strong,
+.admin-submission-table-row strong {
+  color: #000000 !important;
+}
+
+.portal-header p,
+.card-header p,
+.dashboard-nav button,
+.dashboard-session span,
+.dashboard-session em,
+.eyebrow,
+.dashboard-stats span,
+.challenge-header,
+.challenge-title em,
+.challenge-acceptance,
+.challenge-footer,
+.dashboard-footer,
+.admin-identity-card em,
+.admin-side-nav button,
+.admin-side-footer button,
+.admin-console-topbar nav button,
+.workspace-message,
+.submission-table-header,
+.submission-table-row,
+.submission-table-footer,
+.submission-footer,
+.submission-select span,
+.submission-search,
+.submission-back-link,
+.source-viewer-pane header em,
+.execution-log-pane p,
+.admin-submission-table-header,
+.admin-submission-table-row,
+.admin-submission-footer,
+.pane-label,
+.problem-scroll,
+.console-status,
+.console-kicker,
+.console-box strong,
+.ide-statusbar,
+.line-numbers,
+.source-line-numbers {
+  color: #6b7280 !important;
+}
+
+.auth-card,
+.session-debugger,
+.preview-tabs,
+.dashboard-navbar,
+.dashboard-stats article,
+.challenge-table,
+.system-logs,
+.quick-navigation,
+.admin-console-sidebar,
+.admin-identity-card,
+.admin-console-topbar,
+.admin-question-index,
+.question-detail,
+.admin-form,
+.workspace-message,
+.question-row,
+.test-case-row,
+.spec-card,
+.submission-navbar,
+.submission-filters,
+.submission-table,
+.submission-code-panel,
+.submission-footer,
+.source-viewer-pane,
+.execution-log-pane,
+.submission-metric-grid article,
+.admin-submission-filters,
+.admin-submission-table,
+.admin-submission-footer,
+.problem-pane,
+.editor-pane,
+.console-pane,
+.example-box,
+.console-box,
+.language-select,
+.code-editor {
+  border-color: #e5e7eb !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.dashboard-navbar,
+.admin-console-topbar,
+.submission-navbar,
+.editor-toolbar,
+.console-toolbar,
+.source-viewer-pane header,
+.execution-log-pane header,
+.challenge-header,
+.submission-table-header,
+.admin-submission-table-header,
+.ide-statusbar,
+.pane-label,
+.admin-console-sidebar,
+.problem-scroll,
+.source-viewer-body,
+.execution-log-pane > div,
+.code-editor,
+.console-body,
+.input-shell,
+.dashboard-search,
+.submission-search,
+.submission-select,
+.admin-submission-filters input,
+.admin-submission-filters select,
+.admin-form input,
+.admin-form select,
+.admin-form textarea,
+.inline-actions select,
+.code-editor textarea,
+.console-box,
+.example-box,
+.execution-log-pane pre,
+.submission-code-panel pre {
+  border-color: #e5e7eb !important;
+  background: #fafafa !important;
+  color: #1a1c1c !important;
+}
+
+input,
+select,
+textarea,
+.source-viewer-body pre,
+.code-editor textarea {
+  color: #1a1c1c !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+.logo-badge,
+.dashboard-brand span,
+.admin-identity-card > span,
+.admin-submission-logo span {
+  border-color: #000000 !important;
+  border-radius: 4px !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.auth-card,
+.preview-tabs,
+.input-shell,
+.dashboard-navbar,
+.dashboard-stats article,
+.challenge-table,
+.admin-console-sidebar,
+.admin-identity-card,
+.admin-new-problem,
+.admin-side-nav button,
+.admin-side-footer button,
+.admin-console-topbar,
+.question-row,
+.test-case-row,
+.submission-navbar,
+.submission-filters,
+.submission-search,
+.submission-select,
+.submission-refresh,
+.submission-table,
+.submission-table-row button,
+.submission-status-badge,
+.submission-table-footer button,
+.submission-detail-heading button,
+.source-viewer-pane,
+.execution-log-pane,
+.submission-metric-grid article,
+.admin-submission-filters,
+.admin-submission-filters input,
+.admin-submission-filters select,
+.admin-submission-table,
+.admin-submission-table footer button,
+.admin-submission-footer,
+.problem-pane,
+.editor-pane,
+.console-pane,
+.example-box,
+.console-box,
+.language-select,
+.run-button,
+.submit-button,
+.ide-nav-links button,
+.case-tabs button,
+.console-tabs button,
+.problem-tags span,
+.difficulty-tag,
+.challenge-difficulty,
+.challenge-action button {
+  border-radius: 4px !important;
+}
+
+.primary-button,
+.dashboard-primary,
+.admin-new-problem,
+.submit-button,
+.submission-detail-heading button.primary,
+.admin-submission-filters button {
+  border-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.primary-button:hover,
+.dashboard-primary:hover,
+.admin-new-problem:hover,
+.submit-button:hover,
+.submission-detail-heading button.primary:hover,
+.admin-submission-filters button:hover {
+  background: #1f2937 !important;
+  color: #ffffff !important;
+}
+
+.secondary-button,
+.run-button,
+.submission-refresh,
+.submission-table-row button,
+.submission-detail-heading button,
+.submission-code-panel button,
+.challenge-action button,
+.inline-actions button,
+.panel-heading button,
+.admin-form button,
+.test-case-row button,
+.workspace-user span,
+.workspace-user strong,
+.workspace-user button {
+  border: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.secondary-button:hover,
+.run-button:hover,
+.submission-refresh:hover,
+.submission-table-row button:hover,
+.submission-detail-heading button:hover,
+.submission-code-panel button:hover,
+.challenge-action button:hover,
+.admin-side-nav button:hover,
+.admin-side-footer button:hover,
+.quick-navigation button:hover,
+.question-row:hover,
+.challenge-row:hover,
+.submission-table-row:hover,
+.admin-submission-table-row:hover,
+.test-case-row:hover {
+  background: #fafafa !important;
+  color: #000000 !important;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #8b5cf6 !important;
+  outline-offset: 2px !important;
+}
+
+.preview-tabs button.active,
+.dashboard-nav button.active,
+.admin-console-topbar nav button.active,
+.ide-nav-links button.active,
+.console-tabs button.active,
+.admin-side-nav button.active,
+.question-row.active,
+.case-tabs button.active,
+.case-tabs button:hover {
+  color: #8b5cf6 !important;
+}
+
+.dashboard-nav button.active::after,
+.admin-console-topbar nav button.active::after,
+.ide-nav-links button.active::after,
+.admin-side-nav button.active::before {
+  border-color: #8b5cf6 !important;
+  background: #8b5cf6 !important;
+}
+
+.console-tabs button.active {
+  border-bottom-color: #8b5cf6 !important;
+  background: transparent !important;
+}
+
+.admin-side-nav button.active,
+.question-row.active {
+  border-color: #ddd6fe !important;
+  background: #f5f3ff !important;
+}
+
+.challenge-header,
+.challenge-row,
+.submission-table-header,
+.submission-table-row,
+.admin-submission-table-header,
+.admin-submission-table-row,
+.admin-submission-table footer,
+.submission-table-footer,
+.admin-console-topbar,
+.submission-navbar,
+.dashboard-navbar,
+.editor-toolbar,
+.console-toolbar,
+.pane-label,
+.ide-statusbar,
+.source-viewer-pane header,
+.execution-log-pane header {
+  border-color: #e5e7eb !important;
+}
+
+.challenge-status.solved,
+.console-status .accepted,
+.console-box span,
+.submission-status-badge.accepted,
+.problem-tags .difficulty-tag.easy,
+.challenge-difficulty.easy,
+.execution-log-pane pre.success,
+.dashboard-footer strong,
+.submission-footer > span strong,
+.system-logs .ok {
+  border-color: #a7f3d0 !important;
+  background: #ecfdf5 !important;
+  color: #059669 !important;
+}
+
+.console-status .wrong_answer,
+.console-status .compilation_error,
+.console-status .runtime_error,
+.console-status .judge_error,
+.console-status .unknown,
+.console-box span.error-text,
+.submission-status-badge.error,
+.execution-log-pane pre.error,
+.spec-card .danger,
+.challenge-difficulty.hard {
+  border-color: #fecaca !important;
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+}
+
+.console-status .queued,
+.console-status .processing,
+.console-status .time_limit_exceeded,
+.submission-status-badge.time-limit,
+.runtime-warning,
+.problem-tags .difficulty-tag.medium,
+.challenge-difficulty.medium {
+  border-color: #fde68a !important;
+  background: #fffbeb !important;
+  color: #d97706 !important;
+}
+
+.problem-tags span,
+.difficulty-tag,
+.challenge-difficulty,
+.submission-status-badge,
+.live-badge {
+  border: 1px solid #e5e7eb !important;
+  background: #fafafa !important;
+  color: #6b7280 !important;
+}
+
+.live-badge i {
+  background: #8b5cf6 !important;
+  box-shadow: 0 0 0 5px rgba(139, 92, 246, 0.12) !important;
+}
+
+.dashboard-avatar,
+.admin-console-topbar .admin-avatar,
+.ide-avatar,
+.admin-submission-user i {
+  border-color: #e5e7eb !important;
+  background: #fafafa !important;
+  color: #000000 !important;
+}
+
+/* Lumina Terminal: admin Manage Problems readability fixes. */
+.admin-console-content,
+.admin-manage-grid,
+.problem-config,
+.question-detail,
+.admin-question-index,
+.config-panel,
+.test-suite-item,
+.spec-card,
+.sample-grid > div,
+.case-summary-grid > div,
+.append-test-case,
+.audit-box,
+.test-suite-list,
+.test-suite-list-heading {
+  border-color: #e5e7eb !important;
+  background: #ffffff !important;
+  color: #1a1c1c !important;
+  box-shadow: none !important;
+}
+
+.config-panel,
+.question-detail,
+.admin-question-index,
+.test-suite-item,
+.spec-card,
+.sample-grid > div,
+.case-summary-grid > div {
+  border: 1px solid #e5e7eb !important;
+}
+
+.problem-config-header h2,
+.config-panel-heading span,
+.question-detail h2,
+.admin-question-index h2,
+.field-block span,
+.append-test-case label > span,
+.case-summary-grid span,
+.case-buffer-grid span,
+.test-suite-list-heading strong,
+.test-case-form-heading strong,
+.spec-card h3,
+.sample-grid span {
+  color: #111827 !important;
+}
+
+.problem-config-header .eyebrow,
+.config-panel-heading em,
+.test-suite-list-heading span,
+.test-case-form-heading span,
+.case-index,
+.empty-state,
+.description,
+.question-detail p,
+.question-row em,
+.spec-card p span,
+.audit-box span {
+  color: #6b7280 !important;
+}
+
+.field-block input,
+.field-block select,
+.field-block textarea,
+.append-test-case input,
+.append-test-case textarea,
+.case-actions input,
+.case-buffer-grid textarea,
+.case-summary-grid pre,
+.case-summary-grid strong,
+.sample-grid pre {
+  border: 1px solid #d1d5db !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+.field-block input,
+.field-block select {
+  min-height: 42px;
+}
+
+.field-block textarea,
+.append-test-case textarea,
+.case-buffer-grid textarea {
+  min-height: 104px;
+}
+
+.field-block input::placeholder,
+.field-block textarea::placeholder,
+.append-test-case textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+.field-block input:focus,
+.field-block select:focus,
+.field-block textarea:focus,
+.append-test-case input:focus,
+.append-test-case textarea:focus,
+.case-actions input:focus,
+.case-buffer-grid textarea:focus {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18) !important;
+}
+
+.question-row {
+  border-color: #e5e7eb !important;
+  background: #ffffff !important;
+  color: #374151 !important;
+}
+
+.question-row span {
+  color: #374151 !important;
+}
+
+.question-row:hover {
+  background: #fafafa !important;
+}
+
+.question-row.active {
+  border-color: #c4b5fd !important;
+  background: #f5f3ff !important;
+}
+
+.question-row.active span {
+  color: #8b5cf6 !important;
+}
+
+.audit-box {
+  border: 1px solid #e5e7eb !important;
+  background: #fafafa !important;
+}
+
+.audit-box strong {
+  color: #111827 !important;
+}
+
+.audit-box .valid {
+  color: #059669 !important;
+}
+
+.white-action,
+.save-case,
+.edit-case,
+.cancel-case,
+.add-test-case-trigger {
+  border: 1px solid #d1d5db !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+.white-action:hover,
+.save-case:hover,
+.edit-case:hover,
+.cancel-case:hover,
+.add-test-case-trigger:hover {
+  background: #fafafa !important;
+}
+
+.metadata-form .wide-field.white-action,
+button.white-action[type="submit"],
+.append-button {
+  border-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.drop-case {
+  border-color: #fecaca !important;
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+}
+
+.switch-row {
+  border-color: #e5e7eb !important;
+  background: #fafafa !important;
+  color: #374151 !important;
+}
+
+.switch-row input {
+  accent-color: #8b5cf6 !important;
+}
+
+/* Lumina Terminal: stronger scoped readability for admin Manage Problems. */
+.admin-console-content .admin-manage-grid,
+.admin-console-content .admin-manage-main,
+.admin-console-content .problem-config,
+.admin-console-content .metadata-form,
+.admin-console-content .question-list,
+.admin-console-content .test-suite-list,
+.admin-console-content .case-actions,
+.admin-console-content .solve-actions,
+.admin-console-content .test-case-form-controls,
+.admin-console-content .test-case-form-actions,
+.admin-console-content .inline-actions {
+  color: #1a1c1c !important;
+  opacity: 1 !important;
+}
+
+.admin-console-content .admin-question-index,
+.admin-console-content .question-detail,
+.admin-console-content .problem-config,
+.admin-console-content .config-panel,
+.admin-console-content .append-test-case,
+.admin-console-content .test-suite-item,
+.admin-console-content .spec-card,
+.admin-console-content .sample-grid > div,
+.admin-console-content .case-summary-grid > div {
+  border: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  color: #1a1c1c !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+}
+
+.admin-console-content .panel-heading h2,
+.admin-console-content .problem-config-header h2,
+.admin-console-content .config-panel-heading span,
+.admin-console-content .question-detail h2,
+.admin-console-content .field-block > span,
+.admin-console-content .append-test-case label > span,
+.admin-console-content .test-case-form-controls label > span,
+.admin-console-content .case-buffer-grid label > span,
+.admin-console-content .case-summary-grid span,
+.admin-console-content .sample-grid span,
+.admin-console-content .test-case-form-heading strong,
+.admin-console-content .test-suite-list-heading strong,
+.admin-console-content .spec-card h3 {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+.admin-console-content .eyebrow,
+.admin-console-content .panel-heading p,
+.admin-console-content .question-detail .description,
+.admin-console-content .question-detail p,
+.admin-console-content .question-row em,
+.admin-console-content .config-panel-heading em,
+.admin-console-content .test-case-form-heading span,
+.admin-console-content .test-suite-list-heading span,
+.admin-console-content .empty-state,
+.admin-console-content .spec-card p span {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+.admin-console-content .field-block input,
+.admin-console-content .field-block select,
+.admin-console-content .field-block textarea,
+.admin-console-content .append-test-case input,
+.admin-console-content .append-test-case textarea,
+.admin-console-content .case-actions input,
+.admin-console-content .case-buffer-grid textarea,
+.admin-console-content .case-summary-grid pre,
+.admin-console-content .case-summary-grid strong,
+.admin-console-content .sample-grid pre {
+  border: 1px solid #d1d5db !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+  caret-color: #111827 !important;
+  opacity: 1 !important;
+}
+
+.admin-console-content .field-block select option {
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+.admin-console-content .question-row {
+  border: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  color: #374151 !important;
+  opacity: 1 !important;
+}
+
+.admin-console-content .question-row span {
+  color: #374151 !important;
+  opacity: 1 !important;
+}
+
+.admin-console-content .question-row.active {
+  border-color: #c4b5fd !important;
+  background: #f5f3ff !important;
+}
+
+.admin-console-content .question-row.active span {
+  color: #8b5cf6 !important;
+}
+
+.admin-console-content .audit-box {
+  border: 1px solid #e5e7eb !important;
+  background: #fafafa !important;
+  color: #6b7280 !important;
+}
+
+.admin-console-content .audit-box strong {
+  color: #111827 !important;
+}
+
+.admin-console-content .audit-box .valid {
+  color: #059669 !important;
+}
+
+.admin-console-content button:disabled,
+.admin-console-content input:disabled,
+.admin-console-content select:disabled,
+.admin-console-content textarea:disabled {
+  opacity: 0.58 !important;
+}
+
+/* Lumina Terminal: IDE header alignment with dashboard/submission pages. */
+.ide-navbar.dashboard-navbar {
+  min-height: 64px !important;
+  padding: 0 32px !important;
+}
+
+.ide-navbar .dashboard-nav {
+  align-self: stretch !important;
+  justify-content: center !important;
+}
+
+.ide-session.dashboard-session {
+  gap: 10px !important;
+  min-width: 390px !important;
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+.ide-session .live-badge {
+  margin-right: 4px;
+}
+
+.ide-session .run-button,
+.ide-session .submit-button {
+  display: inline-flex !important;
+  width: auto !important;
+  min-width: 74px !important;
+  height: 34px !important;
+  padding: 0 14px !important;
+  white-space: nowrap !important;
+}
+
+.ide-session .icon-button,
+.ide-session .dashboard-avatar {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+}
+
+.editor-toolbar .editor-tools {
+  gap: 8px !important;
+}
+
+.editor-toolbar .language-select {
+  min-width: 132px !important;
+  min-height: 32px !important;
+  border-radius: 4px !important;
+  padding: 0 10px !important;
+}
+
+.editor-toolbar .language-select select {
+  width: 100%;
+  color: #111827 !important;
 }
