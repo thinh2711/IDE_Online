@@ -37,6 +37,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmis
   const [testCaseDrafts, setTestCaseDrafts] = useState({});
   const [testCases, setTestCases] = useState([]);
   const [editingTestCaseId, setEditingTestCaseId] = useState(null);
+  const [questionQuery, setQuestionQuery] = useState('');
   const [showTestCaseForm, setShowTestCaseForm] = useState(false);
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
@@ -46,6 +47,18 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmis
     () => questions.find((question) => question.id === selectedQuestionId) || null,
     [questions, selectedQuestionId]
   );
+  const filteredQuestions = useMemo(() => {
+    const query = questionQuery.trim().toLowerCase();
+
+    if (!query) return questions;
+
+    return questions.filter((question) => {
+      return (
+        String(question.title || '').toLowerCase().includes(query) ||
+        String(question.difficulty || '').toLowerCase().includes(query)
+      );
+    });
+  }, [questionQuery, questions]);
 
   useEffect(() => {
     refreshQuestions().catch(() => {});
@@ -375,14 +388,22 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmis
             <aside className="admin-question-index">
               <div className="panel-heading">
                 <div>
-                  <p className="eyebrow">PROBLEM_INDEX</p>
                   <h2>Questions</h2>
                 </div>
                 <button type="button" onClick={refreshQuestions} disabled={status === 'loading'}>Refresh</button>
               </div>
 
+              <label className="problem-search">
+                <Icon name="search" size={15} />
+                <input
+                  placeholder="Search by title or difficulty..."
+                  value={questionQuery}
+                  onChange={(event) => setQuestionQuery(event.target.value)}
+                />
+              </label>
+
               <div className="question-list">
-                {questions.map((question) => (
+                {filteredQuestions.map((question) => (
                   <button
                     className={question.id === selectedQuestionId ? 'question-row active' : 'question-row'}
                     key={question.id}
@@ -394,6 +415,9 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmis
                   </button>
                 ))}
                 {questions.length === 0 && <p className="empty-state">No questions yet.</p>}
+                {questions.length > 0 && filteredQuestions.length === 0 && (
+                  <p className="empty-state">No matching problems.</p>
+                )}
               </div>
             </aside>
 
@@ -438,7 +462,6 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmis
             <section className="problem-config">
               <div className="problem-config-header">
                 <div>
-                  <p className="eyebrow">SYSTEM // CHALLENGE_CREATOR</p>
                   <h2>Problem Configuration</h2>
                 </div>
                 <button className="white-action" type="button" onClick={refreshQuestions} disabled={status === 'loading'}>

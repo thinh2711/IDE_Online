@@ -5239,6 +5239,11 @@ button.white-action[type="submit"],
   color: #111827 !important;
 }
 
+.admin-console-content .spec-card strong {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
 .admin-console-content .audit-box .valid {
   color: #059669 !important;
 }
@@ -5304,4 +5309,33 @@ button.white-action[type="submit"],
 .editor-toolbar .language-select select {
   width: 100%;
   color: #111827 !important;
+}
+
+/* Lumina Terminal: admin problem index search. */
+.problem-search {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #d1d5db !important;
+  border-radius: 4px !important;
+  padding: 0 12px;
+  background: #ffffff !important;
+  color: #6b7280 !important;
+}
+
+.problem-search:focus-within {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.16) !important;
+}
+
+.problem-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0 !important;
+  background: transparent !important;
+  color: #111827 !important;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.76rem;
+  outline: 0;
 }
