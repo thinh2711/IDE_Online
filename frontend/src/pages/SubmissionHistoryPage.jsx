@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getSubmission, listSubmissions } from '../api/submissions';
+import { listSubmissions } from '../api/submissions';
 import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCreatedAt } from '../utils/date';
@@ -43,12 +43,13 @@ const formatMemory = (submission) => {
   return `${Math.round(Number(submission.memory_kb) / 102.4) / 10} MB`;
 };
 
-export function SubmissionHistoryPage({ onBackToDashboard }) {
+export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpenSubmissionDetail }) {
   const { signOut, token, user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+  const [dateFilter, setDateFilter] = useState('');
   const [languageFilter, setLanguageFilter] = useState('all');
   const [message, setMessage] = useState('');
   const [query, setQuery] = useState('');
-  const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [status, setStatus] = useState('idle');
   const [statusFilter, setStatusFilter] = useState('all');
   const [submissions, setSubmissions] = useState([]);
@@ -62,13 +63,20 @@ export function SubmissionHistoryPage({ onBackToDashboard }) {
 
     return submissions.filter((submission) => {
       const title = submission.question_title || `Question ${submission.question_id || 'practice'}`;
-      const matchesQuery = !loweredQuery || title.toLowerCase().includes(loweredQuery);
+      const submittedBy = submission.submitted_by || `user_${submission.user_id}`;
+      const submittedDate = submission.created_at ? new Date(submission.created_at).toISOString().slice(0, 10) : '';
+      const matchesQuery = !loweredQuery ||
+        title.toLowerCase().includes(loweredQuery) ||
+        String(submission.id).includes(loweredQuery) ||
+        String(submission.user_id).includes(loweredQuery) ||
+        submittedBy.toLowerCase().includes(loweredQuery);
       const matchesStatus = statusFilter === 'all' || submission.status === statusFilter;
       const matchesLanguage = languageFilter === 'all' || submission.language === languageFilter;
+      const matchesDate = !dateFilter || submittedDate === dateFilter;
 
-      return matchesQuery && matchesStatus && matchesLanguage;
+      return matchesQuery && matchesStatus && matchesLanguage && matchesDate;
     });
-  }, [languageFilter, query, statusFilter, submissions]);
+  }, [dateFilter, languageFilter, query, statusFilter, submissions]);
 
   async function refreshSubmissions() {
     setStatus('loading');
@@ -84,15 +92,170 @@ export function SubmissionHistoryPage({ onBackToDashboard }) {
     }
   }
 
-  async function handleViewCode(id) {
-    setMessage('');
+  function handleExportCsv() {
+    const rows = [
+      ['submission_id', 'user_id', 'username', 'problem', 'status', 'runtime', 'memory_kb', 'language', 'created_at'],
+      ...filteredSubmissions.map((submission) => [
+        submission.id,
+        submission.user_id,
+        submission.submitted_by || '',
+        submission.question_title || '',
+        submission.status || '',
+        submission.execution_time || '',
+        submission.memory_kb || '',
+        submission.language || '',
+        submission.created_at || '',
+      ]),
+    ];
+    const csv = rows
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'submission-log.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  }
 
-    try {
-      const data = await getSubmission(token, id);
-      setSelectedSubmission(data.submission);
-    } catch (error) {
-      setMessage(error.message);
-    }
+  if (isAdmin) {
+    return (
+      <main className="admin-console-shell">
+        <aside className="admin-console-sidebar">
+          <div>
+            <section className="admin-identity-card">
+              <span><Icon name="user" size={18} /></span>
+              <div>
+                <strong>ADMIN CONSOLE</strong>
+                <em>SYSTEM ARCHITECT</em>
+              </div>
+            </section>
+
+            <button className="admin-new-problem" type="button" onClick={onOpenProblems}>
+              <Icon name="plus" size={16} /> New Problem
+            </button>
+
+            <nav className="admin-side-nav" aria-label="Admin navigation">
+              <button type="button"><Icon name="terminal" size={16} /> Overview</button>
+              <button type="button" onClick={onOpenProblems}><Icon name="folder" size={16} /> Manage Problems</button>
+              <button type="button" onClick={onOpenProblems}><Icon name="settings" size={16} /> Test Cases</button>
+              <button className="active" type="button"><Icon name="clock" size={16} /> Submissions</button>
+              <button type="button"><Icon name="chart" size={16} /> Analytics</button>
+            </nav>
+          </div>
+
+          <div className="admin-side-footer">
+            <button type="button"><Icon name="book" size={15} /> Documentation</button>
+            <button type="button"><Icon name="shield" size={15} /> Support</button>
+          </div>
+        </aside>
+
+        <section className="admin-console-area">
+          <header className="admin-console-topbar">
+            <strong>IDE ONLINE</strong>
+            <nav>
+              <button type="button" onClick={onBackToDashboard}>Dashboard</button>
+            </nav>
+            <div>
+              <button type="button" title="Notifications"><Icon name="bell" size={17} /></button>
+              <button type="button" title="Settings"><Icon name="settings" size={17} /></button>
+              <button className="admin-avatar" type="button" onClick={signOut} title="Sign out">
+                {user?.username?.slice(0, 1)?.toUpperCase() || 'A'}
+              </button>
+            </div>
+          </header>
+
+          <section className="admin-console-content admin-submission-content">
+            <section className="admin-submission-heading">
+              <div>
+                <p className="eyebrow"><Icon name="terminal" size={14} /> &gt;_ SYSTEM_CORE // ALL_USER_SUBMISSIONS</p>
+                <h1>Admin: Master Submission Log</h1>
+              </div>
+              <button type="button" onClick={handleExportCsv}><Icon name="upload" size={15} /> Download Export CSV</button>
+            </section>
+
+            <section className="admin-submission-filters">
+              <label>
+                <span>Search</span>
+                <input
+                  placeholder="User ID, username, submission..."
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                />
+              </label>
+              <label>
+                <span>Status Filter</span>
+                <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                  {statusOptions.map((option) => (
+                    <option key={option} value={option}>{formatStatus(option)}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Language</span>
+                <select value={languageFilter} onChange={(event) => setLanguageFilter(event.target.value)}>
+                  {languageOptions.map((option) => (
+                    <option key={option} value={option}>{option === 'all' ? 'ALL LANGUAGES' : formatLanguage(option)}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Date Range</span>
+                <input type="date" value={dateFilter} onChange={(event) => setDateFilter(event.target.value)} />
+              </label>
+              <button type="button" onClick={refreshSubmissions} disabled={status === 'loading'}>
+                <Icon name="search" size={14} /> Apply
+              </button>
+            </section>
+
+            {message && <p className="workspace-message">{message}</p>}
+
+            <section className="admin-submission-table" aria-label="All submissions">
+              <div className="admin-submission-table-header">
+                <span>Submission ID</span>
+                <span>User</span>
+                <span>Problem</span>
+                <span>Status</span>
+                <span>Runtime</span>
+                <span>Memory</span>
+                <span>Lang</span>
+              </div>
+              <div>
+                {filteredSubmissions.map((submission) => {
+                  const title = submission.question_title || `Question ${submission.question_id || 'Practice'}`;
+                  const submittedBy = submission.submitted_by || `user_${submission.user_id}`;
+
+                  return (
+                    <article className="admin-submission-table-row" key={submission.id} onClick={() => onOpenSubmissionDetail?.(submission.id)}>
+                      <span>#SUB-{submission.id}</span>
+                      <span className="admin-submission-user"><i>{submittedBy.slice(0, 1).toUpperCase()}</i>{submittedBy}</span>
+                      <strong title={title}>{title}</strong>
+                      <span className={`submission-status-badge ${getStatusClass(submission.status)}`}><i /> {formatStatus(submission.status)}</span>
+                      <span className={submission.status === 'time_limit_exceeded' ? 'runtime-warning' : ''}>{formatRuntime(submission)}</span>
+                      <span>{formatMemory(submission)}</span>
+                      <span>{formatLanguage(submission.language)}</span>
+                    </article>
+                  );
+                })}
+                {filteredSubmissions.length === 0 && (
+                  <p className="dashboard-empty">{status === 'loading' ? 'Loading submissions...' : 'No submissions match the current filters.'}</p>
+                )}
+              </div>
+              <footer>
+                <span>Showing {filteredSubmissions.length ? '1' : '0'}-{filteredSubmissions.length} of {submissions.length}</span>
+                <div><button type="button">&lt;</button><button className="active" type="button">1</button><button type="button">&gt;</button></div>
+              </footer>
+            </section>
+
+            <footer className="admin-submission-footer admin-submission-footer-inline">
+              <span>v2.4.0-stable | Build: 8f2a1c | Environment: Development</span>
+              <span>Status: Operational&nbsp;&nbsp; Uptime: 99.99%</span>
+            </footer>
+          </section>
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -186,7 +349,7 @@ export function SubmissionHistoryPage({ onBackToDashboard }) {
                   </span>
                   <span>{formatMemory(submission)}</span>
                   <span>{formatLanguage(submission.language)}</span>
-                  <button type="button" onClick={() => handleViewCode(submission.id)}>
+                  <button type="button" onClick={() => onOpenSubmissionDetail?.(submission.id)}>
                     <Icon name="terminal" size={13} /> View Code
                   </button>
                 </article>
@@ -209,15 +372,6 @@ export function SubmissionHistoryPage({ onBackToDashboard }) {
           </footer>
         </section>
 
-        {selectedSubmission && (
-          <section className="submission-code-panel">
-            <div>
-              <p className="eyebrow">&gt;_ SOURCE SNAPSHOT #{selectedSubmission.id}</p>
-              <button type="button" onClick={() => setSelectedSubmission(null)}>Close</button>
-            </div>
-            <pre>{selectedSubmission.source_code || '// No source saved'}</pre>
-          </section>
-        )}
       </section>
 
       <footer className="submission-footer">

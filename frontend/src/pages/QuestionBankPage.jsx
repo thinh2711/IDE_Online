@@ -28,7 +28,7 @@ const emptyTestCaseForm = {
   sortOrder: 0,
 };
 
-export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
+export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmissionHistory }) {
   const { signOut, token, user } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
@@ -344,7 +344,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
             <button type="button"><Icon name="terminal" size={16} /> Overview</button>
             <button className="active" type="button"><Icon name="folder" size={16} /> Manage Problems</button>
             <button type="button"><Icon name="settings" size={16} /> Test Cases</button>
-            <button type="button"><Icon name="clock" size={16} /> Submissions</button>
+            <button type="button" onClick={onOpenSubmissionHistory}><Icon name="clock" size={16} /> Submissions</button>
             <button type="button"><Icon name="chart" size={16} /> Analytics</button>
           </nav>
         </div>
@@ -360,9 +360,6 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor }) {
           <strong>IDE ONLINE</strong>
           <nav>
             <button type="button" onClick={onBackToDashboard}>Dashboard</button>
-            <button type="button" onClick={handleOpenSelectedEditor}>IDE</button>
-            <button className="active" type="button">Challenges</button>
-            <button disabled type="button">Community</button>
           </nav>
           <div>
             <button type="button" title="Notifications"><Icon name="bell" size={17} /></button>

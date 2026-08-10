@@ -5,25 +5,30 @@ import { AuthPage } from './pages/AuthPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { EditorPage } from './pages/EditorPage';
 import { QuestionBankPage } from './pages/QuestionBankPage';
+import { SubmissionDetailPage } from './pages/SubmissionDetailPage';
 import { SubmissionHistoryPage } from './pages/SubmissionHistoryPage';
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
   const [activeQuestion, setActiveQuestion] = useState(null);
+  const [activeSubmissionId, setActiveSubmissionId] = useState(null);
   const [view, setView] = useState('dashboard');
 
   const openDashboard = () => {
     setActiveQuestion(null);
+    setActiveSubmissionId(null);
     setView('dashboard');
   };
 
   const openChallenges = () => {
     setActiveQuestion(null);
+    setActiveSubmissionId(null);
     setView('admin');
   };
 
   const openSubmissionHistory = () => {
     setActiveQuestion(null);
+    setActiveSubmissionId(null);
     setView('submissions');
   };
 
@@ -37,14 +42,30 @@ function AppContent() {
         question={activeQuestion}
         onBack={() => setActiveQuestion(null)}
         onBackToDashboard={openDashboard}
-        onOpenChallenges={openChallenges}
         onOpenSubmissionHistory={openSubmissionHistory}
       />
     );
   }
 
+  if (activeSubmissionId) {
+    return (
+      <SubmissionDetailPage
+        id={activeSubmissionId}
+        onBackToDashboard={openDashboard}
+        onBackToHistory={openSubmissionHistory}
+        onOpenEditor={setActiveQuestion}
+      />
+    );
+  }
+
   if (view === 'submissions') {
-    return <SubmissionHistoryPage onBackToDashboard={openDashboard} />;
+    return (
+      <SubmissionHistoryPage
+        onBackToDashboard={openDashboard}
+        onOpenProblems={openChallenges}
+        onOpenSubmissionDetail={setActiveSubmissionId}
+      />
+    );
   }
 
   if (view === 'admin') {
@@ -52,6 +73,7 @@ function AppContent() {
       <QuestionBankPage
         onBackToDashboard={openDashboard}
         onOpenEditor={setActiveQuestion}
+        onOpenSubmissionHistory={openSubmissionHistory}
       />
     );
   }

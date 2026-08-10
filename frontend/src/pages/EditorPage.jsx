@@ -83,7 +83,6 @@ export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpen
   const [message, setMessage] = useState('');
 
   const selectedLanguage = languageOptions.find((option) => option.value === language) || languageOptions[0];
-  const isAdmin = user?.role === 'admin';
   const activeTestCase = testCases[activeCase] || null;
   const title = currentQuestion?.title || 'Select a real question';
   const difficulty = currentQuestion?.difficulty || 'easy';
@@ -224,14 +223,7 @@ export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpen
 
         <nav className="ide-nav-links" aria-label="Workspace navigation">
           <button type="button" onClick={onBackToDashboard}>Dashboard</button>
-          {isAdmin ? (
-            <>
-              <button className="active" type="button">IDE</button>
-              <button type="button" onClick={onOpenChallenges}>Challenges</button>
-            </>
-          ) : (
-            <button type="button" onClick={onOpenSubmissionHistory}>Submission History</button>
-          )}
+          <button type="button" onClick={onOpenSubmissionHistory}>Submission History</button>
         </nav>
 
         <label className="language-select">
