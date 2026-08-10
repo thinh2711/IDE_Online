@@ -43,7 +43,7 @@ const formatMemory = (submission) => {
   return `${Math.round(Number(submission.memory_kb) / 102.4) / 10} MB`;
 };
 
-export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpenSubmissionDetail }) {
+export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpenSubmissionDetail, onOpenUsers }) {
   const { signOut, token, user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const [dateFilter, setDateFilter] = useState('');
@@ -139,6 +139,7 @@ export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpe
             <nav className="admin-side-nav" aria-label="Admin navigation">
               <button type="button" onClick={onBackToDashboard}><Icon name="terminal" size={16} /> Overview</button>
               <button type="button" onClick={onOpenProblems}><Icon name="folder" size={16} /> Manage Problems</button>
+              <button type="button" onClick={onOpenUsers}><Icon name="users" size={16} /> Users</button>
               <button className="active" type="button"><Icon name="clock" size={16} /> Submissions</button>
             </nav>
           </div>

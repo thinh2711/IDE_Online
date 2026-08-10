@@ -8,6 +8,7 @@ import { QuestionBankPage } from './pages/QuestionBankPage';
 import { ReviewerSessionPage } from './pages/ReviewerSessionPage';
 import { SubmissionDetailPage } from './pages/SubmissionDetailPage';
 import { SubmissionHistoryPage } from './pages/SubmissionHistoryPage';
+import { UserManagementPage } from './pages/UserManagementPage';
 
 function AppContent() {
   const { isAuthenticated, user } = useAuth();
@@ -46,6 +47,13 @@ function AppContent() {
     setActiveCodingSession(null);
     setActiveSubmissionId(null);
     setView('submissions');
+  };
+
+  const openUsers = () => {
+    setActiveQuestion(null);
+    setActiveCodingSession(null);
+    setActiveSubmissionId(null);
+    setView('users');
   };
 
   const openEditor = (question, session = null) => {
@@ -105,6 +113,7 @@ function AppContent() {
     return (
       <SubmissionHistoryPage
         onBackToDashboard={openDashboard}
+        onOpenUsers={openUsers}
         onOpenProblems={openChallenges}
         onOpenSubmissionDetail={setActiveSubmissionId}
       />
@@ -117,6 +126,17 @@ function AppContent() {
         onBackToDashboard={openDashboard}
         onOpenEditor={openEditor}
         onOpenSubmissionHistory={openSubmissionHistory}
+        onOpenUsers={openUsers}
+      />
+    );
+  }
+
+  if (view === 'users') {
+    return (
+      <UserManagementPage
+        onBackToDashboard={openDashboard}
+        onManageProblems={openChallenges}
+        onOpenSubmissionHistory={openSubmissionHistory}
       />
     );
   }
@@ -127,6 +147,7 @@ function AppContent() {
       onOpenEditor={openEditor}
       onOpenReviewSession={openReviewSession}
       onOpenSubmissionHistory={openSubmissionHistory}
+      onOpenUsers={openUsers}
     />
   );
 }

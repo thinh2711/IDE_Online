@@ -28,7 +28,7 @@ const emptyTestCaseForm = {
   sortOrder: 0,
 };
 
-export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmissionHistory }) {
+export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmissionHistory, onOpenUsers }) {
   const { signOut, token, user } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
@@ -356,6 +356,7 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmis
           <nav className="admin-side-nav" aria-label="Admin navigation">
             <button type="button" onClick={onBackToDashboard}><Icon name="terminal" size={16} /> Overview</button>
             <button className="active" type="button"><Icon name="folder" size={16} /> Manage Problems</button>
+            <button type="button" onClick={onOpenUsers}><Icon name="users" size={16} /> Users</button>
             <button type="button" onClick={onOpenSubmissionHistory}><Icon name="clock" size={16} /> Submissions</button>
           </nav>
         </div>

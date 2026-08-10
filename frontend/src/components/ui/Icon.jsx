@@ -9,10 +9,20 @@ export function Icon({ name, size = 18 }) {
         <path d="m9 11 3 3L22 4" />
       </>
     ),
+    chevronDown: <path d="m6 9 6 6 6-6" />,
+    chevronLeft: <path d="m15 18-6-6 6-6" />,
+    chevronRight: <path d="m9 18 6-6-6-6" />,
     chart: (
       <>
         <path d="M3 3v18h18" />
         <path d="M7 14l3-3 3 2 5-7" />
+      </>
+    ),
+    download: (
+      <>
+        <path d="M12 3v12" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 21h14" />
       </>
     ),
     bell: (
@@ -56,6 +66,13 @@ export function Icon({ name, size = 18 }) {
     github: (
       <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5a10.4 10.4 0 0 0-5.5 0C8 2 7 2 7 2a6.7 6.7 0 0 0 0 3.5A5.4 5.4 0 0 0 6 9c0 3.5 3 5.5 6 5.5a4.8 4.8 0 0 0-1 3.5v4" />
     ),
+    helpCircle: (
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <path d="M9.1 9a3 3 0 1 1 5.8 1c-.9 1.5-2.9 1.3-2.9 3" />
+        <path d="M12 17h.01" />
+      </>
+    ),
     lock: (
       <>
         <rect x="5" y="11" width="14" height="10" rx="2" />
@@ -68,11 +85,26 @@ export function Icon({ name, size = 18 }) {
         <path d="m3 7 9 6 9-6" />
       </>
     ),
+    moreHorizontal: (
+      <>
+        <circle cx="12" cy="12" r="1" />
+        <circle cx="19" cy="12" r="1" />
+        <circle cx="5" cy="12" r="1" />
+      </>
+    ),
     shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />,
     plus: (
       <>
         <path d="M12 5v14" />
         <path d="M5 12h14" />
+      </>
+    ),
+    refresh: (
+      <>
+        <path d="M3 12a9 9 0 0 1 15.1-6.6L21 8" />
+        <path d="M21 3v5h-5" />
+        <path d="M21 12a9 9 0 0 1-15.1 6.6L3 16" />
+        <path d="M3 21v-5h5" />
       </>
     ),
     settings: (

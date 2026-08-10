@@ -26,7 +26,13 @@ function normalizeQuestion(question, index) {
   };
 }
 
-export function DashboardPage({ onManageProblems, onOpenEditor, onOpenReviewSession, onOpenSubmissionHistory }) {
+export function DashboardPage({
+  onManageProblems,
+  onOpenEditor,
+  onOpenReviewSession,
+  onOpenSubmissionHistory,
+  onOpenUsers,
+}) {
   const { signOut, token, user } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [query, setQuery] = useState('');
@@ -242,6 +248,7 @@ export function DashboardPage({ onManageProblems, onOpenEditor, onOpenReviewSess
             <nav className="admin-side-nav" aria-label="Admin navigation">
               <button className="active" type="button"><Icon name="terminal" size={16} /> Overview</button>
               <button type="button" onClick={onManageProblems}><Icon name="folder" size={16} /> Manage Problems</button>
+              <button type="button" onClick={onOpenUsers}><Icon name="users" size={16} /> Users</button>
               <button type="button" onClick={onOpenSubmissionHistory}><Icon name="clock" size={16} /> Submissions</button>
             </nav>
           </div>
