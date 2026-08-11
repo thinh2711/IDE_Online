@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { listTestCases } from '../api/questions';
-import { createSession, endSession, joinSession } from '../api/sessions';
+import { createSession, endSession, getSession, joinSession, listSessions } from '../api/sessions';
 import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCreatedAt } from '../utils/date';
@@ -20,6 +20,7 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
   const [joinCode, setJoinCode] = useState(initialJoinCode);
   const [message, setMessage] = useState('');
   const [session, setSession] = useState(null);
+  const [sessions, setSessions] = useState([]);
   const [status, setStatus] = useState('idle');
   const [submissions, setSubmissions] = useState([]);
   const [testCases, setTestCases] = useState([]);
@@ -38,6 +39,20 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
 
   const latestSubmission = submissions[0] || null;
 
+  useEffect(() => {
+    if (!['admin', 'viewer'].includes(user?.role)) {
+      setSessions([]);
+      return;
+    }
+
+    loadSavedSessions().catch(() => {});
+  }, [token, user?.role]);
+
+  async function loadSavedSessions() {
+    const data = await listSessions(token);
+    setSessions(data.sessions || []);
+  }
+
   async function handleJoin(event) {
     event.preventDefault();
     setStatus('joining');
@@ -48,6 +63,9 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
       setSession(data.session);
       setSubmissions(data.submissions || []);
       setMessage(`Joined session ${data.session.join_code}.`);
+      if (['admin', 'viewer'].includes(user?.role)) {
+        await loadSavedSessions();
+      }
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -74,6 +92,7 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
       setSession(data.session);
       setSubmissions([]);
       setMessage(`Session ${data.session.join_code} created for this question.`);
+      await loadSavedSessions();
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -91,6 +110,24 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
       const data = await endSession(token, session.id);
       setSession(data.session);
       setMessage(data.message || 'Session ended.');
+      await loadSavedSessions();
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setStatus('idle');
+    }
+  }
+
+  async function handleOpenSavedSession(id) {
+    setStatus('loading-session');
+    setMessage('');
+
+    try {
+      const data = await getSession(token, id);
+      setSession(data.session);
+      setJoinCode(data.session.join_code);
+      setSubmissions(data.submissions || []);
+      setMessage(`Opened saved session ${data.session.join_code}.`);
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -220,6 +257,31 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
                   <Icon name="plus" size={15} /> {status === 'creating' ? 'Creating' : 'Create Session'}
                 </button>
               </form>
+            )}
+
+            {canViewSessionHistory && (
+              <section className="saved-session-list">
+                <header>
+                  <h2>Saved Sessions</h2>
+                  <button type="button" onClick={loadSavedSessions} disabled={status === 'loading-session'}>
+                    <Icon name="clock" size={14} /> Refresh
+                  </button>
+                </header>
+                <div>
+                  {sessions.map((savedSession) => (
+                    <article className={session?.id === savedSession.id ? 'active' : ''} key={savedSession.id}>
+                      <div>
+                        <strong>{savedSession.join_code}</strong>
+                        <span>{savedSession.question_title || 'Question'} · {formatStatus(savedSession.status)}</span>
+                      </div>
+                      <button type="button" onClick={() => handleOpenSavedSession(savedSession.id)}>
+                        Open
+                      </button>
+                    </article>
+                  ))}
+                  {sessions.length === 0 && <p>No saved sessions yet.</p>}
+                </div>
+              </section>
             )}
 
             <section className="execution-log-pane">

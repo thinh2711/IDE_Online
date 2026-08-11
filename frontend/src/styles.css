@@ -5524,6 +5524,83 @@ button.white-action[type="submit"],
   color: #111827;
 }
 
+.saved-session-list {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.saved-session-list header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.saved-session-list h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 0.92rem;
+}
+
+.saved-session-list header button,
+.saved-session-list article button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 0 10px;
+  background: #ffffff;
+  color: #111827;
+  font-weight: 800;
+}
+
+.saved-session-list > div {
+  display: grid;
+  gap: 8px;
+}
+
+.saved-session-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 10px;
+  background: #f9fafb;
+}
+
+.saved-session-list article.active {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+}
+
+.saved-session-list article div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.saved-session-list article strong {
+  color: #111827;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.84rem;
+}
+
+.saved-session-list article span,
+.saved-session-list p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
 @media (max-width: 900px) {
   .reviewer-session-hero,
   .reviewer-session-grid {
