@@ -93,6 +93,7 @@ export function SubmissionDetailPage({ id, onBackToDashboard, onBackToHistory, o
 
     try {
       const data = await runSubmission(token, {
+        expectedOutput: submission.expected_output || '',
         language: submission.language,
         questionId: submission.question_id,
         sourceCode: submission.source_code,

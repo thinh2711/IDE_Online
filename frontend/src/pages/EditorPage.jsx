@@ -136,6 +136,7 @@ export function EditorPage({ onBack, onBackToDashboard, onOpenChallenges, onOpen
 
     try {
       const data = await runSubmission(token, {
+        expectedOutput: sampleOutput,
         language,
         questionId: currentQuestion?.id || null,
         sessionId: session?.id || null,

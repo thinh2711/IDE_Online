@@ -4,6 +4,7 @@ const submissionsRepository = require('./submissions.repository');
 
 const MAX_SOURCE_CODE_LENGTH = 100_000;
 const MAX_STDIN_LENGTH = 20_000;
+const MAX_EXPECTED_OUTPUT_LENGTH = 20_000;
 
 const parseOptionalPositiveId = (id, name) => {
   if (id === undefined || id === null || id === '') {
@@ -35,8 +36,27 @@ const parsePositiveId = (id, name) => {
   return parsedId;
 };
 
-const normalizeRunPayload = ({ questionId = null, sessionId = null, language, sourceCode, stdin = '' }) => {
+const normalizeOutput = (value) => String(value ?? '').replace(/\r\n/g, '\n').trim();
+
+const resolveStatus = ({ expectedOutput, status, stdout }) => {
+  if (status !== 'accepted') return status;
+  if (!String(expectedOutput ?? '').trim()) return status;
+
+  return normalizeOutput(stdout) === normalizeOutput(expectedOutput) ? 'accepted' : 'wrong_answer';
+};
+
+const normalizeRunPayload = ({
+  expectedOutput = null,
+  questionId = null,
+  sessionId = null,
+  language,
+  sourceCode,
+  stdin = '',
+}) => {
   const normalizedLanguage = language?.trim().toLowerCase();
+  const normalizedExpectedOutput = expectedOutput === undefined || expectedOutput === null
+    ? null
+    : String(expectedOutput);
   const normalizedSourceCode = sourceCode === undefined || sourceCode === null ? '' : String(sourceCode);
   const normalizedStdin = stdin === undefined || stdin === null ? '' : String(stdin);
 
@@ -54,6 +74,13 @@ const normalizeRunPayload = ({ questionId = null, sessionId = null, language, so
     throw error;
   }
 
+  if (normalizedExpectedOutput && normalizedExpectedOutput.length > MAX_EXPECTED_OUTPUT_LENGTH) {
+    const error = new Error('Expected output is too large');
+    error.statusCode = 413;
+    error.code = 'PAYLOAD_TOO_LARGE';
+    throw error;
+  }
+
   judge0Client.createJudge0Payload({
     language: normalizedLanguage,
     sourceCode: normalizedSourceCode,
@@ -61,6 +88,7 @@ const normalizeRunPayload = ({ questionId = null, sessionId = null, language, so
   });
 
   return {
+    expectedOutput: normalizedExpectedOutput,
     language: normalizedLanguage,
     questionId: parseOptionalPositiveId(questionId, 'question id'),
     sessionId: parseOptionalPositiveId(sessionId, 'session id'),
@@ -87,6 +115,12 @@ const runSubmission = async ({ body, user }) => {
   await ensureQuestionExists(payload.questionId);
 
   const judge0Draft = await judge0Client.runCode(payload);
+  const stdout = judge0Draft.result?.stdout || null;
+  const status = resolveStatus({
+    expectedOutput: payload.expectedOutput,
+    status: judge0Draft.status,
+    stdout,
+  });
 
   return submissionsRepository.createSubmission({
     userId: user.id,
@@ -95,9 +129,10 @@ const runSubmission = async ({ body, user }) => {
     language: payload.language,
     sourceCode: payload.sourceCode,
     stdin: payload.stdin,
-    stdout: judge0Draft.result?.stdout || null,
+    stdout,
+    expectedOutput: payload.expectedOutput,
     stderr: judge0Draft.result?.stderr || judge0Draft.result?.compile_output || judge0Draft.result?.message || null,
-    status: judge0Draft.status,
+    status,
     executionTime: judge0Draft.result?.time || null,
     memoryKb: judge0Draft.result?.memory || null,
     judge0Payload: judge0Draft.payload,

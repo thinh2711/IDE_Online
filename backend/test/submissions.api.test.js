@@ -82,6 +82,7 @@ beforeEach(() => {
       stdin: payload.stdin,
       status: payload.status,
       stdout: payload.stdout,
+      expected_output: payload.expectedOutput,
       stderr: payload.stderr,
       execution_time: payload.executionTime,
       memory_kb: payload.memoryKb,
@@ -131,6 +132,7 @@ describe('Group 1: submissions service', () => {
         questionId: 1,
         language: ' JavaScript ',
         sourceCode: "console.log('hello')",
+        expectedOutput: 'hello',
         stdin: '',
       },
     });
@@ -151,6 +153,7 @@ describe('Group 1: submissions service', () => {
       sourceCode: "console.log('hello')",
       stdin: '',
       stdout: 'hello\n',
+      expectedOutput: 'hello',
       stderr: null,
       status: 'accepted',
       executionTime: '0.012',
@@ -184,7 +187,25 @@ describe('Group 1: submissions service', () => {
     assert.equal(submissionsRepository.createSubmission.mock.calls.length, 0);
   });
 
-  it('Test 3: rejects unsupported language before storing submission', async () => {
+  it('Test 3: stores wrong_answer when stdout does not match expectedOutput', async () => {
+    const result = await submissionsService.runSubmission({
+      user: {
+        id: 1,
+        role: 'coder',
+      },
+      body: {
+        expectedOutput: 'bye',
+        language: 'javascript',
+        sourceCode: "console.log('hello')",
+      },
+    });
+
+    assert.equal(result.status, 'wrong_answer');
+    assert.equal(result.expected_output, 'bye');
+    assert.equal(submissionsRepository.createSubmission.mock.calls[0].arguments[0].status, 'wrong_answer');
+  });
+
+  it('Test 4: rejects unsupported language before storing submission', async () => {
     await assert.rejects(
       submissionsService.runSubmission({
         user: {
@@ -207,7 +228,7 @@ describe('Group 1: submissions service', () => {
 });
 
 describe('Group 2: submissions controller', () => {
-  it('Test 4: runSubmission returns 201', async () => {
+  it('Test 5: runSubmission returns 201', async () => {
     const req = {
       body: {
         language: 'javascript',

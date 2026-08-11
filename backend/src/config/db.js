@@ -114,6 +114,7 @@ const initDB = async () => {
         source_code TEXT NOT NULL,
         stdin TEXT,
         stdout TEXT,
+        expected_output TEXT,
         stderr TEXT,
         status VARCHAR(50) NOT NULL,
         execution_time NUMERIC(10, 3),
@@ -124,6 +125,7 @@ const initDB = async () => {
     `);
 
     await pool.query('CREATE INDEX IF NOT EXISTS users_role_idx ON users(role);');
+    await pool.query('ALTER TABLE submissions ADD COLUMN IF NOT EXISTS expected_output TEXT;');
     await pool.query('CREATE INDEX IF NOT EXISTS questions_created_by_idx ON questions(created_by);');
     await pool.query('CREATE INDEX IF NOT EXISTS questions_difficulty_idx ON questions(difficulty);');
     await pool.query('CREATE INDEX IF NOT EXISTS test_cases_question_id_idx ON test_cases(question_id);');

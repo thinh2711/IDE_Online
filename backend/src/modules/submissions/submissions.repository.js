@@ -8,6 +8,7 @@ const createSubmission = async ({
   sourceCode,
   stdin = '',
   stdout = null,
+  expectedOutput = null,
   stderr = null,
   status,
   executionTime = null,
@@ -15,13 +16,13 @@ const createSubmission = async ({
   judge0Payload = null,
 }) => {
   const result = await pool.query(
-    `INSERT INTO submissions (
+     `INSERT INTO submissions (
        user_id, question_id, session_id, language, source_code, stdin,
-       stdout, stderr, status, execution_time, memory_kb, judge0_payload
+       stdout, expected_output, stderr, status, execution_time, memory_kb, judge0_payload
      )
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
      RETURNING id, user_id, question_id, session_id, language, source_code, stdin,
-       stdout, stderr, status, execution_time, memory_kb, judge0_payload, created_at`,
+       stdout, expected_output, stderr, status, execution_time, memory_kb, judge0_payload, created_at`,
     [
       userId,
       questionId,
@@ -30,6 +31,7 @@ const createSubmission = async ({
       sourceCode,
       stdin,
       stdout,
+      expectedOutput,
       stderr,
       status,
       executionTime,
@@ -45,10 +47,20 @@ const findSubmissionById = async (id) => {
   const result = await pool.query(
     `SELECT s.id, s.user_id, s.question_id, s.session_id, s.language, s.source_code, s.stdin,
        s.stdout, s.stderr, s.status, s.execution_time, s.memory_kb, s.judge0_payload, s.created_at,
-       q.title AS question_title, q.sample_output AS expected_output, u.username AS submitted_by
+       q.title AS question_title,
+       COALESCE(s.expected_output, matched_case.expected_output, q.sample_output) AS expected_output,
+       u.username AS submitted_by
      FROM submissions s
      LEFT JOIN questions q ON q.id = s.question_id
      LEFT JOIN users u ON u.id = s.user_id
+     LEFT JOIN LATERAL (
+       SELECT tc.expected_output
+       FROM test_cases tc
+       WHERE tc.question_id = s.question_id
+         AND COALESCE(tc.input, '') = COALESCE(s.stdin, '')
+       ORDER BY tc.sort_order ASC, tc.id ASC
+       LIMIT 1
+     ) matched_case ON true
      WHERE s.id = $1`,
     [id]
   );
