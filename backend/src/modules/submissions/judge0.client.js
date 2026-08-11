@@ -44,6 +44,28 @@ const createJudge0Payload = ({ language, sourceCode, stdin = '' }) => {
   };
 };
 
+const encodeBase64 = (value = '') => Buffer.from(String(value ?? ''), 'utf8').toString('base64');
+
+const decodeBase64 = (value) => {
+  if (value === undefined || value === null) return value;
+
+  return Buffer.from(String(value), 'base64').toString('utf8');
+};
+
+const encodeJudge0Payload = (payload) => ({
+  ...payload,
+  source_code: encodeBase64(payload.source_code),
+  stdin: encodeBase64(payload.stdin || ''),
+});
+
+const decodeJudge0Result = (submission = {}) => ({
+  ...submission,
+  compile_output: decodeBase64(submission.compile_output),
+  message: decodeBase64(submission.message),
+  stderr: decodeBase64(submission.stderr),
+  stdout: decodeBase64(submission.stdout),
+});
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const createJudge0UnavailableError = (message = 'Code runner is temporarily unavailable') => {
@@ -105,11 +127,11 @@ const isFinished = (submission) => {
 const pollSubmission = async (token) => {
   for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt += 1) {
     const submission = await requestJudge0(
-      `/submissions/${token}?base64_encoded=false&fields=stdout,stderr,compile_output,message,status,time,memory,token`
+      `/submissions/${token}?base64_encoded=true&fields=stdout,stderr,compile_output,message,status,time,memory,token`
     );
 
     if (isFinished(submission)) {
-      return submission;
+      return decodeJudge0Result(submission);
     }
 
     await sleep(POLL_INTERVAL_MS);
@@ -120,17 +142,19 @@ const pollSubmission = async (token) => {
 
 const runCode = async ({ language, sourceCode, stdin = '' }) => {
   const payload = createJudge0Payload({ language, sourceCode, stdin });
+  const encodedPayload = encodeJudge0Payload(payload);
 
   try {
-    const submission = await requestJudge0('/submissions?base64_encoded=false&wait=true', {
-      body: JSON.stringify(payload),
+    const submission = await requestJudge0('/submissions?base64_encoded=true&wait=true', {
+      body: JSON.stringify(encodedPayload),
       method: 'POST',
     });
+    const result = decodeJudge0Result(submission);
 
     return {
       payload,
-      result: submission,
-      status: normalizeJudge0Status(submission.status),
+      result,
+      status: normalizeJudge0Status(result.status),
     };
   } catch (error) {
     if (!String(error.message).toLowerCase().includes('wait')) {
@@ -138,8 +162,8 @@ const runCode = async ({ language, sourceCode, stdin = '' }) => {
     }
   }
 
-  const queuedSubmission = await requestJudge0('/submissions?base64_encoded=false&wait=false', {
-    body: JSON.stringify(payload),
+  const queuedSubmission = await requestJudge0('/submissions?base64_encoded=true&wait=false', {
+    body: JSON.stringify(encodedPayload),
     method: 'POST',
   });
   const result = await pollSubmission(queuedSubmission.token);

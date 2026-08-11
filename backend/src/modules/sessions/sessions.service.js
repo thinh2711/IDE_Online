@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const questionsRepository = require('../questions/questions.repository');
+const usersRepository = require('../users/users.repository');
 const sessionsRepository = require('./sessions.repository');
 const {
   parsePositiveId,
@@ -28,6 +29,32 @@ const ensureQuestionExists = async (questionId) => {
   }
 };
 
+const resolveCoderId = async ({ payload, user }) => {
+  if (user.role === 'coder') {
+    return user.id;
+  }
+
+  if (!payload.coderId) {
+    throw createError({
+      code: 'VALIDATION_ERROR',
+      message: 'coderId is required when reviewer or admin creates a session',
+      statusCode: 400,
+    });
+  }
+
+  const coder = await usersRepository.findUserById(payload.coderId);
+
+  if (!coder || coder.role !== 'coder') {
+    throw createError({
+      code: 'CODER_NOT_FOUND',
+      message: 'Coder not found',
+      statusCode: 404,
+    });
+  }
+
+  return coder.id;
+};
+
 const generateJoinCode = () => crypto.randomBytes(5).toString('hex').toUpperCase();
 
 const createUniqueJoinCode = async () => {
@@ -49,6 +76,7 @@ const createUniqueJoinCode = async () => {
 
 const ensureCanAccessSession = ({ session, user }) => {
   if (user.role === 'admin') return;
+  if (user.role === 'viewer') return;
   if (session.coder_id === user.id) return;
 
   throw createError({
@@ -61,10 +89,11 @@ const ensureCanAccessSession = ({ session, user }) => {
 const createSession = async ({ body, user }) => {
   const payload = validateCreateSessionBody(body);
   await ensureQuestionExists(payload.questionId);
+  const coderId = await resolveCoderId({ payload, user });
 
   const joinCode = await createUniqueJoinCode();
   const session = await sessionsRepository.createSession({
-    coderId: user.id,
+    coderId,
     joinCode,
     questionId: payload.questionId,
   });

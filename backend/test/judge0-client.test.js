@@ -67,3 +67,43 @@ describe('Group 2: Judge0 friendly errors', () => {
     );
   });
 });
+
+describe('Group 3: Judge0 Base64 transport', () => {
+  it('Test 1: sends encoded source/stdin and decodes execution output', async () => {
+    let requestPath = '';
+    let requestBody = null;
+
+    mock.method(globalThis, 'fetch', async (url, options) => {
+      requestPath = url;
+      requestBody = JSON.parse(options.body);
+
+      return {
+        json: async () => ({
+          memory: 8000,
+          status: {
+            description: 'Accepted',
+            id: 3,
+          },
+          stderr: null,
+          stdout: Buffer.from('ok\n', 'utf8').toString('base64'),
+          time: '0.01',
+        }),
+        ok: true,
+        status: 200,
+      };
+    });
+
+    const result = await runCode({
+      language: 'javascript',
+      sourceCode: 'console.log("ok")',
+      stdin: 'input',
+    });
+
+    assert.match(requestPath, /base64_encoded=true/);
+    assert.equal(requestBody.source_code, Buffer.from('console.log("ok")', 'utf8').toString('base64'));
+    assert.equal(requestBody.stdin, Buffer.from('input', 'utf8').toString('base64'));
+    assert.equal(result.payload.source_code, 'console.log("ok")');
+    assert.equal(result.result.stdout, 'ok\n');
+    assert.equal(result.status, 'accepted');
+  });
+});

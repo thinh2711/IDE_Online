@@ -9,6 +9,15 @@ const listUsers = async (req, res, next) => {
   }
 };
 
+const listCoders = async (req, res, next) => {
+  try {
+    const users = await usersService.listCoders();
+    res.status(200).json({ users });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const changeUserRole = async (req, res, next) => {
   try {
     const user = await usersService.changeUserRole({
@@ -28,5 +37,6 @@ const changeUserRole = async (req, res, next) => {
 
 module.exports = {
   changeUserRole,
+  listCoders,
   listUsers,
 };

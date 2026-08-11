@@ -165,7 +165,7 @@ export function DashboardPage({
               <span className="challenge-acceptance">{question.acceptance}</span>
               <div className="challenge-action">
                 {isViewer ? (
-                  <button type="button" onClick={() => onOpenReviewSession?.()}>
+                  <button type="button" onClick={() => onOpenReviewSession?.('', question)}>
                     Review <Icon name="users" size={14} />
                   </button>
                 ) : (
@@ -378,7 +378,7 @@ export function DashboardPage({
                 <span className="challenge-acceptance">{question.acceptance}</span>
                 <div className="challenge-action">
                   {isViewer ? (
-                    <button type="button" onClick={() => onOpenReviewSession?.()}>
+                    <button type="button" onClick={() => onOpenReviewSession?.('', question)}>
                       Review <Icon name="users" size={14} />
                     </button>
                   ) : (

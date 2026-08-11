@@ -5456,6 +5456,74 @@ button.white-action[type="submit"],
   color: #111827;
 }
 
+.interview-create-form {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.interview-create-form h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 0.92rem;
+}
+
+.interview-create-form label {
+  display: grid;
+  gap: 7px;
+}
+
+.interview-create-form span {
+  color: #6b7280;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.interview-create-form select {
+  min-height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 0 10px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.reviewer-testcase-row {
+  display: grid;
+  gap: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 0;
+}
+
+.reviewer-testcase-row strong {
+  color: #111827;
+}
+
+.reviewer-testcase-row span {
+  width: max-content;
+  border: 1px solid #d1fae5;
+  border-radius: 4px;
+  padding: 3px 7px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.reviewer-testcase-row pre {
+  overflow: auto;
+  margin: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 10px;
+  background: #f9fafb;
+  color: #111827;
+}
+
 @media (max-width: 900px) {
   .reviewer-session-hero,
   .reviewer-session-grid {

@@ -2,7 +2,9 @@ const { pool } = require('../../config/db');
 
 const mapSessionSelect = `
   s.id, s.coder_id, s.question_id, s.join_code, s.status, s.created_at, s.ended_at,
-  q.title AS question_title, q.difficulty AS question_difficulty,
+  q.title AS question_title, q.description AS question_description,
+  q.difficulty AS question_difficulty, q.sample_input AS question_sample_input,
+  q.sample_output AS question_sample_output,
   u.username AS coder_username
 `;
 

@@ -17,6 +17,15 @@ const findUserById = async (id) => {
   return result.rows[0] || null;
 };
 
+const findUsersByRole = async (role) => {
+  const result = await pool.query(
+    'SELECT id, full_name, username, role, created_at FROM users WHERE role = $1 ORDER BY username ASC, id ASC',
+    [role]
+  );
+
+  return result.rows;
+};
+
 const updateUserRole = async ({ id, role }) => {
   const result = await pool.query(
     'UPDATE users SET role = $1 WHERE id = $2 RETURNING id, full_name, username, role, created_at',
@@ -29,5 +38,6 @@ const updateUserRole = async ({ id, role }) => {
 module.exports = {
   findAllUsers,
   findUserById,
+  findUsersByRole,
   updateUserRole,
 };

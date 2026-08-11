@@ -6,6 +6,10 @@ const listUsers = async () => {
   return usersRepository.findAllUsers();
 };
 
+const listCoders = async () => {
+  return usersRepository.findUsersByRole('coder');
+};
+
 const changeUserRole = async ({ requesterId, targetUserId, role }) => {
   const parsedTargetUserId = Number(targetUserId);
   const normalizedRole = role?.trim().toLowerCase();
@@ -48,5 +52,6 @@ const changeUserRole = async ({ requesterId, targetUserId, role }) => {
 
 module.exports = {
   changeUserRole,
+  listCoders,
   listUsers,
 };

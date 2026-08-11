@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react';
-import { endSession, joinSession } from '../api/sessions';
+import { useEffect, useMemo, useState } from 'react';
+import { listTestCases } from '../api/questions';
+import { createSession, endSession, joinSession } from '../api/sessions';
+import { listCoders } from '../api/users';
 import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCreatedAt } from '../utils/date';
@@ -14,18 +16,44 @@ const getStatusClass = (status) => {
   return 'neutral';
 };
 
-export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard }) {
+export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, onOpenEditor, question = null }) {
   const { signOut, token, user } = useAuth();
+  const [coders, setCoders] = useState([]);
+  const [coderId, setCoderId] = useState('');
   const [joinCode, setJoinCode] = useState(initialJoinCode);
   const [message, setMessage] = useState('');
   const [session, setSession] = useState(null);
   const [status, setStatus] = useState('idle');
   const [submissions, setSubmissions] = useState([]);
+  const [testCases, setTestCases] = useState([]);
+
+  useEffect(() => {
+    if (!question?.id) {
+      setTestCases([]);
+      return;
+    }
+
+    listTestCases(token, question.id)
+      .then((data) => setTestCases(data.testCases || []))
+      .catch((error) => setMessage(error.message));
+  }, [question?.id, token]);
+
+  useEffect(() => {
+    if (!['admin', 'viewer'].includes(user?.role)) {
+      setCoders([]);
+      return;
+    }
+
+    listCoders(token)
+      .then((data) => {
+        const coderUsers = data.users || [];
+        setCoders(coderUsers);
+        setCoderId((current) => current || String(coderUsers[0]?.id || ''));
+      })
+      .catch((error) => setMessage(error.message));
+  }, [token, user?.role]);
 
   const latestSubmission = submissions[0] || null;
-  const codeLines = useMemo(() => {
-    return String(latestSubmission?.source_code || '// No session submission yet').split('\n');
-  }, [latestSubmission?.source_code]);
 
   async function handleJoin(event) {
     event.preventDefault();
@@ -37,6 +65,33 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard })
       setSession(data.session);
       setSubmissions(data.submissions || []);
       setMessage(`Joined session ${data.session.join_code}.`);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setStatus('idle');
+    }
+  }
+
+  async function handleCreateSession(event) {
+    event.preventDefault();
+
+    if (!question?.id) {
+      setMessage('Select a question before creating a session.');
+      return;
+    }
+
+    setStatus('creating');
+    setMessage('');
+
+    try {
+      const data = await createSession(token, {
+        coderId,
+        questionId: question.id,
+      });
+      setJoinCode(data.session.join_code);
+      setSession(data.session);
+      setSubmissions([]);
+      setMessage(`Session ${data.session.join_code} created for ${data.session.coder_username}.`);
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -62,6 +117,37 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard })
   }
 
   const canEndSession = session && (user?.role === 'admin' || session.coder_id === user?.id);
+  const canStartCoding = session?.status === 'active' && session.coder_id === user?.id;
+  const displayQuestion = session
+    ? {
+        description: session.question_description,
+        difficulty: session.question_difficulty,
+        id: session.question_id,
+        sample_input: session.question_sample_input,
+        sample_output: session.question_sample_output,
+        title: session.question_title,
+      }
+    : question;
+  const headingTitle = displayQuestion?.title || 'Join Review Session';
+  const displayedSource = latestSubmission?.source_code
+    || displayQuestion?.description
+    || '// Select a question or join an active session to view candidate code.';
+  const codeLines = useMemo(() => {
+    return String(displayedSource).split('\n');
+  }, [displayedSource]);
+
+  function handleStartCoding() {
+    if (!session?.question_id) return;
+
+    onOpenEditor?.({
+      description: session.question_description,
+      difficulty: session.question_difficulty || 'easy',
+      id: session.question_id,
+      sample_input: session.question_sample_input || '',
+      sample_output: session.question_sample_output || '',
+      title: session.question_title || 'Session Question',
+    }, session);
+  }
 
   return (
     <main className="reviewer-session-shell">
@@ -89,7 +175,12 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard })
         <section className="reviewer-session-hero">
           <div>
             <p className="eyebrow">&gt;_ REVIEW_CHANNEL</p>
-            <h1>{session ? session.question_title || 'Live Coding Session' : 'Join Review Session'}</h1>
+            <h1>{headingTitle}</h1>
+            {displayQuestion?.difficulty && (
+              <span className={`challenge-difficulty ${displayQuestion.difficulty}`}>
+                {displayQuestion.difficulty.toUpperCase()}
+              </span>
+            )}
             <span className={`submission-status-badge ${getStatusClass(session?.status)}`}>
               <i /> {formatStatus(session?.status || 'waiting')}
             </span>
@@ -112,6 +203,11 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard })
                 <Icon name="lock" size={15} /> {status === 'ending' ? 'Ending' : 'End'}
               </button>
             )}
+            {canStartCoding && (
+              <button className="dashboard-primary" type="button" onClick={handleStartCoding}>
+                <Icon name="terminal" size={15} /> Start Coding
+              </button>
+            )}
           </form>
         </section>
 
@@ -120,18 +216,37 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard })
         <section className="reviewer-session-grid">
           <section className="source-viewer-pane">
             <header>
-              <span><Icon name="terminal" size={14} /> readonly-session.{latestSubmission?.language || 'txt'}</span>
+              <span><Icon name="terminal" size={14} /> {latestSubmission ? `readonly-session.${latestSubmission.language}` : 'question-brief.md'}</span>
               <em>{session?.join_code || 'NO SESSION'}</em>
             </header>
             <div className="source-viewer-body">
               <div className="source-line-numbers">
                 {codeLines.map((_, index) => <span key={index + 1}>{index + 1}</span>)}
               </div>
-              <pre>{codeLines.join('\n')}</pre>
+              <pre>{displayedSource}</pre>
             </div>
           </section>
 
           <aside className="reviewer-session-side">
+            {question?.id && ['admin', 'viewer'].includes(user?.role) && (
+              <form className="interview-create-form" onSubmit={handleCreateSession}>
+                <h2>Create Interview Session</h2>
+                <label>
+                  <span>CODER</span>
+                  <select value={coderId} onChange={(event) => setCoderId(event.target.value)}>
+                    {coders.map((coder) => (
+                      <option key={coder.id} value={coder.id}>
+                        {coder.username} - {coder.full_name || 'Coder'}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button className="dashboard-primary" type="submit" disabled={!coderId || status === 'creating'}>
+                  <Icon name="plus" size={15} /> {status === 'creating' ? 'Creating' : 'Create Session'}
+                </button>
+              </form>
+            )}
+
             <section className="submission-metric-grid">
               <article>
                 <span>Coder</span>
@@ -139,7 +254,7 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard })
               </article>
               <article>
                 <span>Question</span>
-                <strong>{session?.question_title || 'N/A'}</strong>
+                <strong>{displayQuestion?.title || 'N/A'}</strong>
               </article>
               <article>
                 <span>Created</span>
@@ -149,6 +264,20 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard })
                 <span>Submissions</span>
                 <strong>{submissions.length}</strong>
               </article>
+            </section>
+
+            <section className="execution-log-pane">
+              <header><Icon name="book" size={14} /> Visible Test Cases</header>
+              <div>
+                {testCases.map((testCase, index) => (
+                  <article className="reviewer-testcase-row" key={testCase.id}>
+                    <strong>Case #{index + 1}</strong>
+                    <span>{testCase.is_hidden ? 'Hidden' : 'Visible'}</span>
+                    <pre>Input: {testCase.input || '(empty)'}{'\n'}Expected: {testCase.expected_output || '(empty)'}</pre>
+                  </article>
+                ))}
+                {testCases.length === 0 && <p>No visible test cases are available for this question.</p>}
+              </div>
             </section>
 
             <section className="execution-log-pane">

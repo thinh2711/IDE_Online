@@ -5,11 +5,13 @@ const questionsRepositoryPath = require.resolve('../src/modules/questions/questi
 const sessionsControllerPath = require.resolve('../src/modules/sessions/sessions.controller');
 const sessionsRepositoryPath = require.resolve('../src/modules/sessions/sessions.repository');
 const sessionsServicePath = require.resolve('../src/modules/sessions/sessions.service');
+const usersRepositoryPath = require.resolve('../src/modules/users/users.repository');
 
 let questionsRepository;
 let sessionsController;
 let sessionsRepository;
 let sessionsService;
+let usersRepository;
 
 const createResponse = () => {
   const res = {
@@ -82,10 +84,25 @@ beforeEach(() => {
     findSubmissionsForSession: mock.fn(async () => []),
   };
 
+  usersRepository = {
+    findUserById: mock.fn(async (id) => {
+      if (Number(id) === 2) {
+        return {
+          id: 2,
+          role: 'coder',
+          username: 'candidate',
+        };
+      }
+
+      return null;
+    }),
+  };
+
   delete require.cache[questionsRepositoryPath];
   delete require.cache[sessionsControllerPath];
   delete require.cache[sessionsRepositoryPath];
   delete require.cache[sessionsServicePath];
+  delete require.cache[usersRepositoryPath];
 
   require.cache[questionsRepositoryPath] = {
     id: questionsRepositoryPath,
@@ -98,6 +115,12 @@ beforeEach(() => {
     filename: sessionsRepositoryPath,
     loaded: true,
     exports: sessionsRepository,
+  };
+  require.cache[usersRepositoryPath] = {
+    id: usersRepositoryPath,
+    filename: usersRepositoryPath,
+    loaded: true,
+    exports: usersRepository,
   };
 
   sessionsService = require('../src/modules/sessions/sessions.service');
@@ -128,7 +151,24 @@ describe('Group 1: sessions service', () => {
     assert.equal(sessionsRepository.findSessionByJoinCode.mock.calls[0].arguments[0], 'ABC12345');
   });
 
-  it('Test 3: rejects invalid join codes', async () => {
+  it('Test 3: lets a reviewer create a session for a coder', async () => {
+    const session = await sessionsService.createSession({
+      body: {
+        coderId: 2,
+        questionId: 1,
+      },
+      user: {
+        id: 3,
+        role: 'viewer',
+      },
+    });
+
+    assert.equal(session.id, 10);
+    assert.equal(usersRepository.findUserById.mock.calls[0].arguments[0], 2);
+    assert.equal(sessionsRepository.createSession.mock.calls[0].arguments[0].coderId, 2);
+  });
+
+  it('Test 4: rejects invalid join codes', async () => {
     await assert.rejects(
       sessionsService.joinSession({
         body: { joinCode: 'bad' },
@@ -142,7 +182,7 @@ describe('Group 1: sessions service', () => {
     );
   });
 
-  it('Test 4: prevents non-owner coder from ending a session', async () => {
+  it('Test 5: prevents non-owner coder from ending a session', async () => {
     await assert.rejects(
       sessionsService.endSession({
         id: 10,
@@ -158,7 +198,7 @@ describe('Group 1: sessions service', () => {
 });
 
 describe('Group 2: sessions controller', () => {
-  it('Test 5: createSession returns 201', async () => {
+  it('Test 6: createSession returns 201', async () => {
     const res = createResponse();
     const next = createNext();
 

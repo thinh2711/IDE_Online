@@ -11,6 +11,12 @@ export function listUsers(token) {
   });
 }
 
+export function listCoders(token) {
+  return requestJson('/api/users/coders', {
+    headers: authHeaders(token),
+  });
+}
+
 export function changeUserRole(token, id, role) {
   return requestJson(`/api/users/${id}/role`, {
     method: 'PATCH',

@@ -16,6 +16,7 @@ function AppContent() {
   const [activeQuestion, setActiveQuestion] = useState(null);
   const [activeSubmissionId, setActiveSubmissionId] = useState(null);
   const [reviewJoinCode, setReviewJoinCode] = useState('');
+  const [reviewQuestion, setReviewQuestion] = useState(null);
   const [view, setView] = useState('dashboard');
 
   useEffect(() => {
@@ -25,6 +26,7 @@ function AppContent() {
     setActiveCodingSession(null);
     setActiveSubmissionId(null);
     setReviewJoinCode('');
+    setReviewQuestion(null);
     setView('dashboard');
   }, [isAuthenticated, user?.id, user?.role]);
 
@@ -32,6 +34,7 @@ function AppContent() {
     setActiveQuestion(null);
     setActiveCodingSession(null);
     setActiveSubmissionId(null);
+    setReviewQuestion(null);
     setView('dashboard');
   };
 
@@ -39,6 +42,7 @@ function AppContent() {
     setActiveQuestion(null);
     setActiveCodingSession(null);
     setActiveSubmissionId(null);
+    setReviewQuestion(null);
     setView('admin');
   };
 
@@ -46,6 +50,7 @@ function AppContent() {
     setActiveQuestion(null);
     setActiveCodingSession(null);
     setActiveSubmissionId(null);
+    setReviewQuestion(null);
     setView('submissions');
   };
 
@@ -53,6 +58,7 @@ function AppContent() {
     setActiveQuestion(null);
     setActiveCodingSession(null);
     setActiveSubmissionId(null);
+    setReviewQuestion(null);
     setView('users');
   };
 
@@ -62,11 +68,12 @@ function AppContent() {
     setActiveSubmissionId(null);
   };
 
-  const openReviewSession = (joinCode = '') => {
+  const openReviewSession = (joinCode = '', question = null) => {
     setActiveQuestion(null);
     setActiveCodingSession(null);
     setActiveSubmissionId(null);
     setReviewJoinCode(joinCode);
+    setReviewQuestion(question);
     setView('reviewSession');
   };
 
@@ -105,6 +112,8 @@ function AppContent() {
       <ReviewerSessionPage
         initialJoinCode={reviewJoinCode}
         onBackToDashboard={openDashboard}
+        onOpenEditor={openEditor}
+        question={reviewQuestion}
       />
     );
   }
