@@ -8,12 +8,12 @@ const mapSessionSelect = `
   u.username AS coder_username
 `;
 
-const createSession = async ({ coderId, questionId, joinCode }) => {
+const createSession = async ({ questionId, joinCode }) => {
   const result = await pool.query(
-    `INSERT INTO sessions (coder_id, question_id, join_code)
-     VALUES ($1, $2, $3)
+    `INSERT INTO sessions (question_id, join_code)
+     VALUES ($1, $2)
      RETURNING id, coder_id, question_id, join_code, status, created_at, ended_at`,
-    [coderId, questionId, joinCode]
+    [questionId, joinCode]
   );
 
   return result.rows[0];
@@ -45,17 +45,17 @@ const findSessionByJoinCode = async (joinCode) => {
   return result.rows[0] || null;
 };
 
-const findSessionsForUser = async ({ role, userId }) => {
-  const isAdmin = role === 'admin';
+const findSessionsForUser = async ({ role }) => {
+  const canSeeAllSessions = ['admin', 'viewer'].includes(role);
   const result = await pool.query(
     `SELECT ${mapSessionSelect}
      FROM sessions s
      LEFT JOIN questions q ON q.id = s.question_id
      LEFT JOIN users u ON u.id = s.coder_id
-     WHERE ($1::boolean = true OR s.coder_id = $2)
+     WHERE $1::boolean = true
      ORDER BY s.created_at DESC, s.id DESC
      LIMIT 30`,
-    [isAdmin, userId]
+    [canSeeAllSessions]
   );
 
   return result.rows;

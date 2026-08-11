@@ -31,7 +31,6 @@ const parsePositiveId = (id, name) => {
 };
 
 const validateCreateSessionBody = (body = {}) => ({
-  coderId: parseOptionalPositiveId(body.coderId, 'coder id'),
   questionId: parseOptionalPositiveId(body.questionId, 'question id'),
 });
 

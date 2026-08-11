@@ -94,7 +94,7 @@ const initDB = async () => {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS sessions (
         id SERIAL PRIMARY KEY,
-        coder_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        coder_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         question_id INTEGER REFERENCES questions(id) ON DELETE SET NULL,
         join_code VARCHAR(32) NOT NULL,
         status VARCHAR(20) NOT NULL DEFAULT 'active',
@@ -125,6 +125,7 @@ const initDB = async () => {
     `);
 
     await pool.query('CREATE INDEX IF NOT EXISTS users_role_idx ON users(role);');
+    await pool.query('ALTER TABLE sessions ALTER COLUMN coder_id DROP NOT NULL;');
     await pool.query('ALTER TABLE submissions ADD COLUMN IF NOT EXISTS expected_output TEXT;');
     await pool.query('CREATE INDEX IF NOT EXISTS questions_created_by_idx ON questions(created_by);');
     await pool.query('CREATE INDEX IF NOT EXISTS questions_difficulty_idx ON questions(difficulty);');

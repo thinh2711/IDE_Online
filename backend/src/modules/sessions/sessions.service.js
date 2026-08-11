@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const questionsRepository = require('../questions/questions.repository');
-const usersRepository = require('../users/users.repository');
 const sessionsRepository = require('./sessions.repository');
 const {
   parsePositiveId,
@@ -29,32 +28,6 @@ const ensureQuestionExists = async (questionId) => {
   }
 };
 
-const resolveCoderId = async ({ payload, user }) => {
-  if (user.role === 'coder') {
-    return user.id;
-  }
-
-  if (!payload.coderId) {
-    throw createError({
-      code: 'VALIDATION_ERROR',
-      message: 'coderId is required when reviewer or admin creates a session',
-      statusCode: 400,
-    });
-  }
-
-  const coder = await usersRepository.findUserById(payload.coderId);
-
-  if (!coder || coder.role !== 'coder') {
-    throw createError({
-      code: 'CODER_NOT_FOUND',
-      message: 'Coder not found',
-      statusCode: 404,
-    });
-  }
-
-  return coder.id;
-};
-
 const generateJoinCode = () => crypto.randomBytes(5).toString('hex').toUpperCase();
 
 const createUniqueJoinCode = async () => {
@@ -77,7 +50,6 @@ const createUniqueJoinCode = async () => {
 const ensureCanAccessSession = ({ session, user }) => {
   if (user.role === 'admin') return;
   if (user.role === 'viewer') return;
-  if (session.coder_id === user.id) return;
 
   throw createError({
     code: 'FORBIDDEN',
@@ -87,13 +59,19 @@ const ensureCanAccessSession = ({ session, user }) => {
 };
 
 const createSession = async ({ body, user }) => {
+  if (!['admin', 'viewer'].includes(user.role)) {
+    throw createError({
+      code: 'FORBIDDEN',
+      message: 'Only admin or reviewer can create a session',
+      statusCode: 403,
+    });
+  }
+
   const payload = validateCreateSessionBody(body);
   await ensureQuestionExists(payload.questionId);
-  const coderId = await resolveCoderId({ payload, user });
 
   const joinCode = await createUniqueJoinCode();
   const session = await sessionsRepository.createSession({
-    coderId,
     joinCode,
     questionId: payload.questionId,
   });
@@ -102,13 +80,12 @@ const createSession = async ({ body, user }) => {
 };
 
 const listSessions = async ({ user }) => {
-  if (user.role === 'viewer') {
+  if (!['admin', 'viewer'].includes(user.role)) {
     return [];
   }
 
   return sessionsRepository.findSessionsForUser({
     role: user.role,
-    userId: user.id,
   });
 };
 
@@ -130,7 +107,7 @@ const getSession = async ({ id, user }) => {
   return { session, submissions };
 };
 
-const joinSession = async ({ body }) => {
+const joinSession = async ({ body, user }) => {
   const payload = validateJoinSessionBody(body);
   const session = await sessionsRepository.findSessionByJoinCode(payload.joinCode);
 
@@ -142,7 +119,9 @@ const joinSession = async ({ body }) => {
     });
   }
 
-  const submissions = await sessionsRepository.findSubmissionsForSession(session.id);
+  const submissions = ['admin', 'viewer'].includes(user.role)
+    ? await sessionsRepository.findSubmissionsForSession(session.id)
+    : [];
 
   return { session, submissions };
 };

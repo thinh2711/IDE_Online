@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { listQuestions } from '../api/questions';
-import { createSession } from '../api/sessions';
 import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -53,23 +52,6 @@ export function DashboardPage({
     try {
       const data = await listQuestions(token);
       setQuestions(data.questions || []);
-    } catch (error) {
-      setMessage(error.message);
-    } finally {
-      setStatus('idle');
-    }
-  }
-
-  async function handleCreateSession(question) {
-    setStatus('loading');
-    setMessage('');
-
-    try {
-      const data = await createSession(token, {
-        questionId: question.id,
-      });
-      setMessage(`Session ${data.session.join_code} created for ${question.title}.`);
-      onOpenEditor?.(question, data.session);
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -164,19 +146,14 @@ export function DashboardPage({
               </span>
               <span className="challenge-acceptance">{question.acceptance}</span>
               <div className="challenge-action">
-                {isViewer ? (
+                {isViewer || isAdmin ? (
                   <button type="button" onClick={() => onOpenReviewSession?.('', question)}>
                     Review <Icon name="users" size={14} />
                   </button>
                 ) : (
-                  <>
-                    <button type="button" onClick={() => onOpenEditor?.(question)}>
-                      Solve <Icon name="arrowRight" size={14} />
-                    </button>
-                    <button type="button" onClick={() => handleCreateSession(question)} disabled={status === 'loading'}>
-                      Session <Icon name="users" size={14} />
-                    </button>
-                  </>
+                  <button type="button" onClick={() => onOpenEditor?.(question)}>
+                    Solve <Icon name="arrowRight" size={14} />
+                  </button>
                 )}
               </div>
             </article>
@@ -377,19 +354,14 @@ export function DashboardPage({
                 </span>
                 <span className="challenge-acceptance">{question.acceptance}</span>
                 <div className="challenge-action">
-                  {isViewer ? (
+                  {isViewer || isAdmin ? (
                     <button type="button" onClick={() => onOpenReviewSession?.('', question)}>
                       Review <Icon name="users" size={14} />
                     </button>
                   ) : (
-                    <>
-                      <button type="button" onClick={() => onOpenEditor?.(question)}>
-                        Solve <Icon name="arrowRight" size={14} />
-                      </button>
-                      <button type="button" onClick={() => handleCreateSession(question)} disabled={status === 'loading'}>
-                        Session <Icon name="users" size={14} />
-                      </button>
-                    </>
+                    <button type="button" onClick={() => onOpenEditor?.(question)}>
+                      Solve <Icon name="arrowRight" size={14} />
+                    </button>
                   )}
                 </div>
               </article>

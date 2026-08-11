@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { listTestCases } from '../api/questions';
 import { createSession, endSession, joinSession } from '../api/sessions';
-import { listCoders } from '../api/users';
 import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCreatedAt } from '../utils/date';
@@ -18,40 +17,24 @@ const getStatusClass = (status) => {
 
 export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, onOpenEditor, question = null }) {
   const { signOut, token, user } = useAuth();
-  const [coders, setCoders] = useState([]);
-  const [coderId, setCoderId] = useState('');
   const [joinCode, setJoinCode] = useState(initialJoinCode);
   const [message, setMessage] = useState('');
   const [session, setSession] = useState(null);
   const [status, setStatus] = useState('idle');
   const [submissions, setSubmissions] = useState([]);
   const [testCases, setTestCases] = useState([]);
+  const questionIdForTestCases = question?.id || session?.question_id;
 
   useEffect(() => {
-    if (!question?.id) {
+    if (!questionIdForTestCases) {
       setTestCases([]);
       return;
     }
 
-    listTestCases(token, question.id)
+    listTestCases(token, questionIdForTestCases)
       .then((data) => setTestCases(data.testCases || []))
       .catch((error) => setMessage(error.message));
-  }, [question?.id, token]);
-
-  useEffect(() => {
-    if (!['admin', 'viewer'].includes(user?.role)) {
-      setCoders([]);
-      return;
-    }
-
-    listCoders(token)
-      .then((data) => {
-        const coderUsers = data.users || [];
-        setCoders(coderUsers);
-        setCoderId((current) => current || String(coderUsers[0]?.id || ''));
-      })
-      .catch((error) => setMessage(error.message));
-  }, [token, user?.role]);
+  }, [questionIdForTestCases, token]);
 
   const latestSubmission = submissions[0] || null;
 
@@ -85,13 +68,12 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
 
     try {
       const data = await createSession(token, {
-        coderId,
         questionId: question.id,
       });
       setJoinCode(data.session.join_code);
       setSession(data.session);
       setSubmissions([]);
-      setMessage(`Session ${data.session.join_code} created for ${data.session.coder_username}.`);
+      setMessage(`Session ${data.session.join_code} created for this question.`);
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -116,8 +98,10 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
     }
   }
 
-  const canEndSession = session && (user?.role === 'admin' || session.coder_id === user?.id);
-  const canStartCoding = session?.status === 'active' && session.coder_id === user?.id;
+  const canEndSession = session && ['admin', 'viewer'].includes(user?.role);
+  const canStartCoding = session?.status === 'active' && user?.role === 'coder';
+  const canViewSessionHistory = ['admin', 'viewer'].includes(user?.role);
+  const uniqueCoderCount = new Set(submissions.map((submission) => submission.user_id)).size;
   const displayQuestion = session
     ? {
         description: session.question_description,
@@ -231,26 +215,24 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
             {question?.id && ['admin', 'viewer'].includes(user?.role) && (
               <form className="interview-create-form" onSubmit={handleCreateSession}>
                 <h2>Create Interview Session</h2>
-                <label>
-                  <span>CODER</span>
-                  <select value={coderId} onChange={(event) => setCoderId(event.target.value)}>
-                    {coders.map((coder) => (
-                      <option key={coder.id} value={coder.id}>
-                        {coder.username} - {coder.full_name || 'Coder'}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button className="dashboard-primary" type="submit" disabled={!coderId || status === 'creating'}>
+                <p>Any coder with the join code can enter this room and submit code for the selected question.</p>
+                <button className="dashboard-primary" type="submit" disabled={status === 'creating'}>
                   <Icon name="plus" size={15} /> {status === 'creating' ? 'Creating' : 'Create Session'}
                 </button>
               </form>
             )}
 
+            <section className="execution-log-pane">
+              <header><Icon name="book" size={14} /> Question Description</header>
+              <div>
+                <pre>{displayQuestion?.description || 'No description is available for this question.'}</pre>
+              </div>
+            </section>
+
             <section className="submission-metric-grid">
               <article>
-                <span>Coder</span>
-                <strong><Icon name="user" size={15} /> {session?.coder_username || 'N/A'}</strong>
+                <span>Coders Joined</span>
+                <strong><Icon name="user" size={15} /> {uniqueCoderCount}</strong>
               </article>
               <article>
                 <span>Question</span>
@@ -280,19 +262,21 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
               </div>
             </section>
 
-            <section className="execution-log-pane">
-              <header><Icon name="clock" size={14} /> Session Submissions</header>
-              <div>
-                {submissions.map((submission) => (
-                  <article className="reviewer-submission-row" key={submission.id}>
-                    <strong>#{submission.id} {formatStatus(submission.status)}</strong>
-                    <span>{submission.language} · {formatCreatedAt(submission.created_at)}</span>
-                    <pre>{submission.stdout || submission.stderr || '(no output)'}</pre>
-                  </article>
-                ))}
-                {submissions.length === 0 && <p>No submissions have been attached to this session yet.</p>}
-              </div>
-            </section>
+            {canViewSessionHistory && (
+              <section className="execution-log-pane">
+                <header><Icon name="clock" size={14} /> Session Submissions</header>
+                <div>
+                  {submissions.map((submission) => (
+                    <article className="reviewer-submission-row" key={submission.id}>
+                      <strong>#{submission.id} {formatStatus(submission.status)}</strong>
+                      <span>{submission.submitted_by || 'Coder'} · {submission.language} · {formatCreatedAt(submission.created_at)}</span>
+                      <pre>{submission.stdout || submission.stderr || '(no output)'}</pre>
+                    </article>
+                  ))}
+                  {submissions.length === 0 && <p>No submissions have been attached to this session yet.</p>}
+                </div>
+              </section>
+            )}
           </aside>
         </section>
       </section>
