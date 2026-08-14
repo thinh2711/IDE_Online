@@ -52,15 +52,15 @@ function escapeCsvValue(value) {
   return `"${text.replaceAll('"', '""')}"`;
 }
 
-function AdminSidebar({ onBackToDashboard, onManageProblems, onOpenSubmissionHistory }) {
+function AdminSidebar({ onBackToDashboard, onManageProblems, onOpenSubmissionHistory, user }) {
   return (
     <aside className="admin-console-sidebar user-management-sidebar">
       <div>
         <section className="admin-identity-card">
           <span><Icon name="user" size={18} /></span>
           <div>
-            <strong>ADMIN CONSOLE</strong>
-            <em>SYSTEM ARCHITECT</em>
+            <strong>Admin</strong>
+            <em>{user?.username || 'User'}</em>
           </div>
         </section>
 
@@ -84,10 +84,7 @@ function AdminSidebar({ onBackToDashboard, onManageProblems, onOpenSubmissionHis
         </nav>
       </div>
 
-      <div className="admin-side-footer">
-        <button type="button"><Icon name="book" size={15} /> Documentation</button>
-        <button type="button"><Icon name="shield" size={15} /> Support</button>
-      </div>
+      <div className="admin-side-footer" />
     </aside>
   );
 }
@@ -274,6 +271,7 @@ export function UserManagementPage({
         onBackToDashboard={onBackToDashboard}
         onManageProblems={onManageProblems}
         onOpenSubmissionHistory={onOpenSubmissionHistory}
+        user={user}
       />
 
       <section className="user-management-area">
@@ -363,14 +361,6 @@ export function UserManagementPage({
           </section>
         </section>
 
-        <footer className="user-management-footer">
-          <span>(c) 2024 DevEngine Systems. All services operational.</span>
-          <nav aria-label="System links">
-            <a href="#build">Build 8821</a>
-            <a href="#security">Security Policy</a>
-            <a href="#uptime">Uptime Status</a>
-          </nav>
-        </footer>
       </section>
     </main>
   );

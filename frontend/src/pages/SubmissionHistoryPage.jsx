@@ -127,8 +127,8 @@ export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpe
             <section className="admin-identity-card">
               <span><Icon name="user" size={18} /></span>
               <div>
-                <strong>ADMIN CONSOLE</strong>
-                <em>SYSTEM ARCHITECT</em>
+                <strong>Admin</strong>
+                <em>{user?.username || 'User'}</em>
               </div>
             </section>
 
@@ -168,7 +168,6 @@ export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpe
           <section className="admin-console-content admin-submission-content">
             <section className="admin-submission-heading">
               <div>
-                <p className="eyebrow"><Icon name="terminal" size={14} /> &gt;_ SYSTEM_CORE // ALL_USER_SUBMISSIONS</p>
                 <h1>Admin: Master Submission Log</h1>
               </div>
               <button type="button" onClick={handleExportCsv}><Icon name="upload" size={15} /> Download Export CSV</button>
@@ -247,10 +246,6 @@ export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpe
               </footer>
             </section>
 
-            <footer className="admin-submission-footer admin-submission-footer-inline">
-              <span>v2.4.0-stable | Build: 8f2a1c | Environment: Development</span>
-              <span>Status: Operational&nbsp;&nbsp; Uptime: 99.99%</span>
-            </footer>
           </section>
         </section>
       </main>
@@ -266,12 +261,11 @@ export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpe
         </div>
 
         <nav className="dashboard-nav">
-          <button type="button" onClick={onBackToDashboard}>DASHBOARD</button>
-          <button className="active" type="button">SUBMISSIONS</button>
+          <button type="button" onClick={onBackToDashboard}>Dashboard</button>
+          <button className="active" type="button">Submissions</button>
         </nav>
 
         <div className="dashboard-session">
-          <button type="button" title="Console"><Icon name="terminal" size={17} /></button>
           <button type="button" title="Settings"><Icon name="settings" size={17} /></button>
           <button className="dashboard-avatar" type="button" onClick={signOut} title="Sign out">
             {user?.username?.slice(0, 1)?.toUpperCase() || 'U'}
@@ -281,7 +275,6 @@ export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpe
 
       <section className="submission-main">
         <section className="submission-headline">
-          <p className="eyebrow"><Icon name="terminal" size={14} /> &gt;_ SYSTEM_CORE // EXECUTION_HISTORY</p>
           <h1>Submission History</h1>
         </section>
 
@@ -363,7 +356,7 @@ export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpe
           </div>
 
           <footer className="submission-table-footer">
-            <span>SHOWING {filteredSubmissions.length ? '1' : '0'}-{filteredSubmissions.length} OF {submissions.length} SUBMISSIONS</span>
+            <span>{filteredSubmissions.length} of {submissions.length} submissions</span>
             <div>
               <button type="button" disabled>&lt;</button>
               <button type="button" disabled>&gt;</button>
@@ -373,15 +366,6 @@ export function SubmissionHistoryPage({ onBackToDashboard, onOpenProblems, onOpe
 
       </section>
 
-      <footer className="submission-footer">
-        <div>
-          <strong>IDE ONLINE</strong>
-          <span>Status</span>
-          <span>API Docs</span>
-          <span>Privacy</span>
-        </div>
-        <span>BUILD: V4.2.0-STABLE | ENVIRONMENT: <strong>DEVELOPMENT</strong></span>
-      </footer>
     </main>
   );
 }

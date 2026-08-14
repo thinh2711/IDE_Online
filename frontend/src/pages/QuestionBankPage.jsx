@@ -340,8 +340,8 @@ export function QuestionBankPage({ onBackToDashboard, onOpenEditor, onOpenSubmis
           <section className="admin-identity-card">
             <span><Icon name="user" size={18} /></span>
             <div>
-              <strong>ADMIN CONSOLE</strong>
-              <em>SYSTEM ARCHITECT</em>
+              <strong>Admin</strong>
+              <em>{user?.username || 'User'}</em>
             </div>
           </section>
 

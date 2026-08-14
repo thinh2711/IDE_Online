@@ -80,7 +80,6 @@ export function DashboardPage({
   const renderDashboardContent = () => (
     <section className="dashboard-main admin-dashboard-main">
       <section className="dashboard-headline">
-        <p className="eyebrow">&gt;_ SYSTEM_CORE</p>
         <div>
           <h1>Coding Challenges</h1>
           <div className="dashboard-actions">
@@ -168,8 +167,8 @@ export function DashboardPage({
         <footer className="challenge-footer">
           <span>
             {status === 'loading'
-              ? 'SYNCING CHALLENGE INDEX'
-              : `SHOWING ${challengeRows.length ? '1' : '0'}-${challengeRows.length} OF ${totalQuestions} ENTRIES`}
+              ? 'Loading challenges'
+              : `${challengeRows.length} of ${totalQuestions} challenges`}
           </span>
           <div>
             <button type="button">&lt;</button>
@@ -182,23 +181,11 @@ export function DashboardPage({
       </section>
 
       <section className="dashboard-widgets">
-        <article className="system-logs">
-          <h2>SYSTEM LOGS</h2>
-          <div>
-            <p className="ok">[08:42:11] Connected to worker node localhost</p>
-            <p>[08:42:15] Challenge dataset synced: {totalQuestions} problems</p>
-            <p>[08:42:18] Indexing metadata for admin/coder workspace...</p>
-            <p>-</p>
-          </div>
-        </article>
         <article className="quick-navigation">
-          <h2>QUICK NAVIGATION</h2>
+          <h2>Quick Links</h2>
           <div>
-            <button type="button" onClick={onOpenSubmissionHistory}><Icon name="folder" size={16} /> MY SUBMISSIONS</button>
-            <button type="button" onClick={() => onOpenReviewSession?.()}><Icon name="users" size={16} /> REVIEW SESSION</button>
-            <button type="button"><Icon name="users" size={16} /> TEAM RANKINGS</button>
-            <button type="button"><Icon name="zap" size={16} /> DAILY CHALLENGE</button>
-            <button type="button"><Icon name="book" size={16} /> DOCUMENTATION</button>
+            <button type="button" onClick={onOpenSubmissionHistory}><Icon name="folder" size={16} /> My Submissions</button>
+            <button type="button" onClick={() => onOpenReviewSession?.()}><Icon name="users" size={16} /> Review Session</button>
           </div>
         </article>
       </section>
@@ -213,8 +200,8 @@ export function DashboardPage({
             <section className="admin-identity-card">
               <span><Icon name="user" size={18} /></span>
               <div>
-                <strong>ADMIN CONSOLE</strong>
-                <em>SYSTEM ARCHITECT</em>
+                <strong>Admin</strong>
+                <em>{user?.username || 'User'}</em>
               </div>
             </section>
 
@@ -230,10 +217,7 @@ export function DashboardPage({
             </nav>
           </div>
 
-          <div className="admin-side-footer">
-            <button type="button"><Icon name="book" size={15} /> Documentation</button>
-            <button type="button"><Icon name="shield" size={15} /> Support</button>
-          </div>
+          <div className="admin-side-footer" />
         </aside>
 
         <section className="admin-console-area">
@@ -264,18 +248,17 @@ export function DashboardPage({
       <header className="dashboard-navbar">
         <div className="dashboard-brand">
           <span>I</span>
-          <strong>IDE ONLINE</strong>
+          <strong>IDE Online</strong>
         </div>
 
         <nav className="dashboard-nav">
-          <button className="active" type="button">DASHBOARD</button>
-          <button type="button" onClick={onOpenSubmissionHistory}>SUBMISSION HISTORY</button>
-          <button type="button" onClick={() => onOpenReviewSession?.()}>REVIEW SESSION</button>
+          <button className="active" type="button">Dashboard</button>
+          <button type="button" onClick={onOpenSubmissionHistory}>Submissions</button>
+          <button type="button" onClick={() => onOpenReviewSession?.()}>Review</button>
         </nav>
 
         <div className="dashboard-session">
           <div>
-            <span>SESSION ID: 0X8F2A</span>
             <em>Role: {user?.role || 'coder'}</em>
           </div>
           <button type="button" title="Notifications"><Icon name="bell" size={17} /></button>
@@ -288,7 +271,6 @@ export function DashboardPage({
 
       <section className="dashboard-main">
         <section className="dashboard-headline">
-          <p className="eyebrow">&gt;_ SYSTEM_CORE</p>
           <div>
             <h1>Coding Challenges</h1>
             <div className="dashboard-actions">
@@ -376,8 +358,8 @@ export function DashboardPage({
           <footer className="challenge-footer">
             <span>
               {status === 'loading'
-                ? 'SYNCING CHALLENGE INDEX'
-                : `SHOWING ${challengeRows.length ? '1' : '0'}-${challengeRows.length} OF ${totalQuestions} ENTRIES`}
+                ? 'Loading challenges'
+                : `${challengeRows.length} of ${totalQuestions} challenges`}
             </span>
             <div>
               <button type="button">&lt;</button>
@@ -390,35 +372,15 @@ export function DashboardPage({
         </section>
 
         <section className="dashboard-widgets">
-          <article className="system-logs">
-            <h2>SYSTEM LOGS</h2>
-            <div>
-              <p className="ok">[08:42:11] Connected to worker node localhost</p>
-              <p>[08:42:15] Challenge dataset synced: {totalQuestions} problems</p>
-              <p>[08:42:18] Indexing metadata for admin/coder workspace...</p>
-              <p>-</p>
-            </div>
-          </article>
           <article className="quick-navigation">
-            <h2>QUICK NAVIGATION</h2>
+            <h2>Quick Links</h2>
             <div>
-              <button type="button" onClick={onOpenSubmissionHistory}><Icon name="folder" size={16} /> MY SUBMISSIONS</button>
-              <button type="button" onClick={() => onOpenReviewSession?.()}><Icon name="users" size={16} /> REVIEW SESSION</button>
-              <button type="button"><Icon name="users" size={16} /> TEAM RANKINGS</button>
-              <button type="button"><Icon name="zap" size={16} /> DAILY CHALLENGE</button>
-              <button type="button"><Icon name="book" size={16} /> DOCUMENTATION</button>
+              <button type="button" onClick={onOpenSubmissionHistory}><Icon name="folder" size={16} /> My Submissions</button>
+              <button type="button" onClick={() => onOpenReviewSession?.()}><Icon name="users" size={16} /> Review Session</button>
             </div>
           </article>
         </section>
       </section>
-
-      <footer className="dashboard-footer">
-        <div>
-          <span>BUILD: V4.2.0-STABLE</span>
-          <strong><i /> ENVIRONMENT: DEVELOPMENT</strong>
-        </div>
-        <span>ONLINE CODE EDITOR MVP</span>
-      </footer>
     </main>
   );
 }

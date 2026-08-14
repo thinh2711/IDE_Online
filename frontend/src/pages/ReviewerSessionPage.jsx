@@ -175,16 +175,15 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
       <header className="submission-navbar">
         <div className="dashboard-brand">
           <span>I</span>
-          <strong>IDE ONLINE</strong>
+          <strong>IDE Online</strong>
         </div>
 
         <nav className="dashboard-nav">
-          <button type="button" onClick={onBackToDashboard}>DASHBOARD</button>
-          <button className="active" type="button">REVIEW SESSION</button>
+          <button type="button" onClick={onBackToDashboard}>Dashboard</button>
+          <button className="active" type="button">Review Session</button>
         </nav>
 
         <div className="dashboard-session">
-          <button type="button" title="Console"><Icon name="terminal" size={17} /></button>
           <button type="button" title="Settings"><Icon name="settings" size={17} /></button>
           <button className="dashboard-avatar" type="button" onClick={signOut} title="Sign out">
             {user?.username?.slice(0, 1)?.toUpperCase() || 'U'}
@@ -195,7 +194,6 @@ export function ReviewerSessionPage({ initialJoinCode = '', onBackToDashboard, o
       <section className="reviewer-session-main">
         <section className="reviewer-session-hero">
           <div>
-            <p className="eyebrow">&gt;_ REVIEW_CHANNEL</p>
             <h1>{headingTitle}</h1>
             {displayQuestion?.difficulty && (
               <span className={`challenge-difficulty ${displayQuestion.difficulty}`}>
