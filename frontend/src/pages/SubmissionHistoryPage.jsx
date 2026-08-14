@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { formatCreatedAt } from '../utils/date';
 
 const statusOptions = ['all', 'accepted', 'wrong_answer', 'runtime_error', 'compilation_error', 'time_limit_exceeded'];
-const languageOptions = ['all', 'python', 'javascript', 'cpp', 'java', 'c'];
+const languageOptions = ['all', 'python', 'cpp'];
 
 const formatStatus = (status) => {
   return String(status || 'unknown').replace(/_/g, ' ').toUpperCase();
@@ -13,10 +13,7 @@ const formatStatus = (status) => {
 
 const formatLanguage = (language) => {
   const labels = {
-    c: 'C',
     cpp: 'C++',
-    java: 'Java',
-    javascript: 'JavaScript',
     python: 'Python 3',
   };
 

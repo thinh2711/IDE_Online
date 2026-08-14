@@ -8,9 +8,7 @@ const defaultCode = '';
 
 const languageOptions = [
   { extension: 'py', label: 'Python 3', value: 'python' },
-  { extension: 'js', label: 'JavaScript', value: 'javascript' },
   { extension: 'cpp', label: 'C++', value: 'cpp' },
-  { extension: 'java', label: 'Java', value: 'java' },
 ];
 
 const difficultyClass = {

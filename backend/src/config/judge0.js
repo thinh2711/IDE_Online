@@ -1,10 +1,7 @@
 const { env } = require('./env');
 
 const languageMap = {
-  c: 50,
   cpp: 54,
-  java: 62,
-  javascript: 63,
   python: 71,
 };
 

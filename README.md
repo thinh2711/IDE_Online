@@ -19,7 +19,7 @@ Project nay co the dung lam nen cho online code editor tuong tu LeetCode. Bo tai
 
 ## Chay bang Docker
 
-Build va start 3 container frontend + API + PostgreSQL:
+Build va start frontend + API + PostgreSQL app + Judge0 self-hosted:
 
 ```bash
 docker compose up --build
@@ -41,6 +41,24 @@ PostgreSQL chay trong Docker network noi bo qua service name:
 
 ```text
 db:5432
+```
+
+Judge0 local chay tai:
+
+```text
+http://localhost:2358
+```
+
+Backend API goi Judge0 qua Docker network:
+
+```text
+http://judge0-server:2358
+```
+
+Kiem tra Judge0 da san sang:
+
+```bash
+curl http://localhost:2358/languages
 ```
 
 Dung stack:
@@ -93,7 +111,7 @@ DB_PASSWORD=postgres
 DB_NAME=auth_db
 ```
 
-Khi chay Docker Compose, app dung `DATABASE_URL` da khai bao trong `docker-compose.yml`.
+Khi chay Docker Compose, app dung `DATABASE_URL` va `JUDGE0_BASE_URL` da khai bao trong `docker-compose.yml`.
 
 ## Chay React development server
 
@@ -172,4 +190,5 @@ curl http://localhost:3000/api/me \
 - `vite.config.js`: cau hinh Vite build React va proxy API khi dev.
 - `Dockerfile`: build image rieng cho API.
 - `Dockerfile.frontend`: build image rieng cho frontend Vite.
-- `docker-compose.yml`: chay rieng 3 service frontend, API va PostgreSQL trong cung Docker network.
+- `docker-compose.yml`: chay frontend, API, PostgreSQL app va Judge0 self-hosted trong cung Docker network.
+- `judge0.conf`: cau hinh rieng cho Judge0 server, workers, Redis va PostgreSQL noi bo cua Judge0.

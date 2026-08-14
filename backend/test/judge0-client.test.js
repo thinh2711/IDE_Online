@@ -34,8 +34,8 @@ describe('Group 2: Judge0 friendly errors', () => {
 
     await assert.rejects(
       runCode({
-        language: 'javascript',
-        sourceCode: "console.log('hello')",
+        language: 'python',
+        sourceCode: "print('hello')",
         stdin: '',
       }),
       {
@@ -94,15 +94,15 @@ describe('Group 3: Judge0 Base64 transport', () => {
     });
 
     const result = await runCode({
-      language: 'javascript',
-      sourceCode: 'console.log("ok")',
+      language: 'python',
+      sourceCode: 'print("ok")',
       stdin: 'input',
     });
 
     assert.match(requestPath, /base64_encoded=true/);
-    assert.equal(requestBody.source_code, Buffer.from('console.log("ok")', 'utf8').toString('base64'));
+    assert.equal(requestBody.source_code, Buffer.from('print("ok")', 'utf8').toString('base64'));
     assert.equal(requestBody.stdin, Buffer.from('input', 'utf8').toString('base64'));
-    assert.equal(result.payload.source_code, 'console.log("ok")');
+    assert.equal(result.payload.source_code, 'print("ok")');
     assert.equal(result.result.stdout, 'ok\n');
     assert.equal(result.status, 'accepted');
   });

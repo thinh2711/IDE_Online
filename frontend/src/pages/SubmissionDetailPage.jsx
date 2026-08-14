@@ -8,10 +8,7 @@ const formatStatus = (status) => String(status || 'unknown').replace(/_/g, ' ').
 
 const formatLanguage = (language) => {
   const labels = {
-    c: 'C',
     cpp: 'C++',
-    java: 'Java',
-    javascript: 'JavaScript',
     python: 'Python 3',
   };
 
@@ -20,10 +17,7 @@ const formatLanguage = (language) => {
 
 const formatExtension = (language) => {
   const extensions = {
-    c: 'c',
     cpp: 'cpp',
-    java: 'java',
-    javascript: 'js',
     python: 'py',
   };
 

@@ -9,17 +9,45 @@ JUDGE0_WALL_TIME_LIMIT=15
 JUDGE0_MEMORY_LIMIT_KB=262144
 ```
 
+## Local Docker Compose Setup
+
+Project dang chay Judge0 self-hosted trong `docker-compose.yml`.
+
+| Service | Purpose |
+| --- | --- |
+| `judge0-server` | HTTP API cua Judge0, expose local tai `http://localhost:2358` |
+| `judge0-workers` | Xu ly queue va execute submissions trong sandbox |
+| `judge0-db` | PostgreSQL rieng cua Judge0 |
+| `judge0-redis` | Redis queue/cache rieng cua Judge0 |
+
+Backend app khong goi Judge0 public nua. Trong Docker network, API dung:
+
+```text
+JUDGE0_BASE_URL=http://judge0-server:2358
+```
+
+Chay stack:
+
+```bash
+docker compose up --build
+```
+
+Kiem tra Judge0 local:
+
+```bash
+curl http://localhost:2358/languages
+```
+
+Judge0 can `privileged: true` de sandbox execution hoat dong dung trong container.
+
 ## Language Map For MVP
 
 Judge0 language IDs depend on the deployed Judge0 version. Confirm IDs from `/languages` after starting Judge0.
 
 | App language | Typical Judge0 name | Notes |
 | --- | --- | --- |
-| `c` | C | Need compile |
 | `cpp` | C++ | Need compile |
-| `javascript` | JavaScript Node.js | Good first demo language |
 | `python` | Python 3 | Good first demo language |
-| `java` | Java | Class name rules may matter |
 
 ## Backend Flow
 
@@ -65,8 +93,8 @@ Week 7/Phase 2 can move toward asynchronous grading:
 
 ```json
 {
-  "language_id": 63,
-  "source_code": "console.log('hello')",
+  "language_id": 71,
+  "source_code": "print('hello')",
   "stdin": "",
   "cpu_time_limit": 10,
   "wall_time_limit": 15,

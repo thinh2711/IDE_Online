@@ -35,7 +35,12 @@ const createNext = () => mock.fn();
 beforeEach(() => {
   judge0Client = {
     createJudge0Payload: mock.fn(({ language, sourceCode, stdin = '' }) => {
-      if (language === 'ruby') {
+      const languageMap = {
+        cpp: 54,
+        python: 71,
+      };
+
+      if (!languageMap[language]) {
         const error = new Error('This language is not enabled');
         error.statusCode = 400;
         error.code = 'UNSUPPORTED_LANGUAGE';
@@ -43,7 +48,7 @@ beforeEach(() => {
       }
 
       return {
-        language_id: 63,
+        language_id: languageMap[language],
         source_code: sourceCode,
         stdin,
       };
@@ -130,8 +135,8 @@ describe('Group 1: submissions service', () => {
       },
       body: {
         questionId: 1,
-        language: ' JavaScript ',
-        sourceCode: "console.log('hello')",
+        language: ' Python ',
+        sourceCode: "print('hello')",
         expectedOutput: 'hello',
         stdin: '',
       },
@@ -141,7 +146,7 @@ describe('Group 1: submissions service', () => {
     assert.equal(result.stdout, 'hello\n');
     assert.equal(result.execution_time, '0.012');
     assert.equal(result.memory_kb, 912);
-    assert.equal(result.language, 'javascript');
+    assert.equal(result.language, 'python');
     assert.equal(result.user_id, 1);
     assert.equal(result.question_id, 1);
     assert.equal(judge0Client.runCode.mock.calls.length, 1);
@@ -149,8 +154,8 @@ describe('Group 1: submissions service', () => {
       userId: 1,
       questionId: 1,
       sessionId: null,
-      language: 'javascript',
-      sourceCode: "console.log('hello')",
+      language: 'python',
+      sourceCode: "print('hello')",
       stdin: '',
       stdout: 'hello\n',
       expectedOutput: 'hello',
@@ -159,8 +164,8 @@ describe('Group 1: submissions service', () => {
       executionTime: '0.012',
       memoryKb: 912,
       judge0Payload: {
-        language: 'javascript',
-        source_code: "console.log('hello')",
+        language: 'python',
+        source_code: "print('hello')",
         stdin: '',
       },
     });
@@ -195,8 +200,8 @@ describe('Group 1: submissions service', () => {
       },
       body: {
         expectedOutput: 'bye',
-        language: 'javascript',
-        sourceCode: "console.log('hello')",
+        language: 'python',
+        sourceCode: "print('hello')",
       },
     });
 
@@ -213,8 +218,8 @@ describe('Group 1: submissions service', () => {
           role: 'coder',
         },
         body: {
-          language: 'ruby',
-          sourceCode: 'puts "hello"',
+          language: 'javascript',
+          sourceCode: "console.log('hello')",
         },
       }),
       {
@@ -231,8 +236,8 @@ describe('Group 2: submissions controller', () => {
   it('Test 5: runSubmission returns 201', async () => {
     const req = {
       body: {
-        language: 'javascript',
-        sourceCode: "console.log('hello')",
+        language: 'python',
+        sourceCode: "print('hello')",
       },
       user: {
         id: 1,
