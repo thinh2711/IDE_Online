@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { listQuestions } from '../api/questions';
+import { joinSession } from '../api/sessions';
 import { Icon } from '../components/ui/Icon';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -33,12 +34,14 @@ export function DashboardPage({
   onOpenUsers,
 }) {
   const { signOut, token, user } = useAuth();
+  const [joinCode, setJoinCode] = useState('');
   const [questions, setQuestions] = useState([]);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
 
   const isAdmin = user?.role === 'admin';
+  const isCoder = user?.role === 'coder';
   const isViewer = user?.role === 'viewer';
 
   useEffect(() => {
@@ -52,6 +55,30 @@ export function DashboardPage({
     try {
       const data = await listQuestions(token);
       setQuestions(data.questions || []);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setStatus('idle');
+    }
+  }
+
+  async function handleJoinSession(event) {
+    event.preventDefault();
+    setStatus('joining-session');
+    setMessage('');
+
+    try {
+      const data = await joinSession(token, joinCode);
+      const session = data.session;
+
+      onOpenEditor?.({
+        description: session.question_description || '',
+        difficulty: session.question_difficulty || 'easy',
+        id: session.question_id,
+        sample_input: session.question_sample_input || '',
+        sample_output: session.question_sample_output || '',
+        title: session.question_title || 'Session Question',
+      }, session);
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -254,7 +281,7 @@ export function DashboardPage({
         <nav className="dashboard-nav">
           <button className="active" type="button">Dashboard</button>
           <button type="button" onClick={onOpenSubmissionHistory}>Submissions</button>
-          <button type="button" onClick={() => onOpenReviewSession?.()}>Review</button>
+          {isViewer && <button type="button" onClick={() => onOpenReviewSession?.()}>Review</button>}
         </nav>
 
         <div className="dashboard-session">
@@ -292,6 +319,22 @@ export function DashboardPage({
         </section>
 
         {message && <p className="workspace-message">{message}</p>}
+
+        {isCoder && (
+          <form className="dashboard-join-session" onSubmit={handleJoinSession}>
+            <label>
+              <span>Join Session</span>
+              <input
+                placeholder="Enter join code"
+                value={joinCode}
+                onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+              />
+            </label>
+            <button type="submit" disabled={!joinCode.trim() || status === 'joining-session'}>
+              <Icon name="users" size={15} /> {status === 'joining-session' ? 'Joining' : 'Join'}
+            </button>
+          </form>
+        )}
 
         <section className="dashboard-stats">
           <article>
@@ -376,7 +419,9 @@ export function DashboardPage({
             <h2>Quick Links</h2>
             <div>
               <button type="button" onClick={onOpenSubmissionHistory}><Icon name="folder" size={16} /> My Submissions</button>
-              <button type="button" onClick={() => onOpenReviewSession?.()}><Icon name="users" size={16} /> Review Session</button>
+              {!isCoder && (
+                <button type="button" onClick={() => onOpenReviewSession?.()}><Icon name="users" size={16} /> Review Session</button>
+              )}
             </div>
           </article>
         </section>

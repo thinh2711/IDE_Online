@@ -5601,6 +5601,67 @@ button.white-action[type="submit"],
   font-size: 0.82rem;
 }
 
+.dashboard-join-session {
+  display: grid;
+  grid-template-columns: minmax(220px, 360px) auto;
+  align-items: end;
+  gap: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 6px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.dashboard-join-session label {
+  display: grid;
+  gap: 7px;
+}
+
+.dashboard-join-session span {
+  color: #6b7280;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.dashboard-join-session input {
+  min-height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: #111827;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.dashboard-join-session button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 4px;
+  padding: 0 16px;
+  background: #111827;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.dashboard-join-session button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 700px) {
+  .dashboard-join-session {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .reviewer-session-hero,
   .reviewer-session-grid {
